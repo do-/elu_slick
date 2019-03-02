@@ -1,6 +1,6 @@
 (function ($) {
 
-    function RemoteModel () {
+    function RemoteModel (tia, postData) {
     
         var PAGESIZE = 50
         var data = {length: 0}
@@ -9,7 +9,7 @@
         var sortdir = 1
         var h_request = null
         var req = null
-        var postData = {}
+        if (!postData) postData = {}
 
         var onDataLoading = new Slick.Event ()
         var onDataLoaded  = new Slick.Event ()
@@ -58,7 +58,7 @@
 
                 onDataLoading.notify ({from: from, to: to});
 
-                req = $.ajax (dynamicURL ({type: 'users'}), {
+                req = $.ajax (dynamicURL (tia), {
                     dataType:    'json',
                     method:      'POST',
                     processData: false,
@@ -84,7 +84,7 @@
                     req = null
 
                     onDataLoaded.notify ({from: from, to: to})
-darn (data)
+
                 })
 
                 .fail (function (jqXHR, e) {
