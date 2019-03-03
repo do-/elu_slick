@@ -2,14 +2,15 @@
 
     function RemoteModel (tia, postData) {
     
-        var PAGESIZE = 50
+        if (!postData) postData = {}
+        if (!postData.limit) postData.limit = 50 
+
         var data = {length: 0}
         var sortcol = null
         var sortdir = 1
         var h_request = null
         var req = null
-        if (!postData) postData = {}
-
+        
         var onDataLoading = new Slick.Event ()
         var onDataLoaded  = new Slick.Event ()
 
@@ -30,30 +31,29 @@
             if (req) {
                 req.abort ()
                 for (var i = req.fromPage; i <= req.toPage; i ++)
-                data [i * PAGESIZE] = undefined
+                data [i * postData.limit] = undefined
             }
 
             if (from < 0) from = 0
 
             if (data.length > 0) to = Math.min (to, data.length - 1)
 
-            var fromPage = Math.floor (from / PAGESIZE)
-            var toPage   = Math.floor (to   / PAGESIZE)
+            var fromPage = Math.floor (from / postData.limit)
+            var toPage   = Math.floor (to   / postData.limit)
 
-            while (data [fromPage * PAGESIZE] !== undefined && fromPage < toPage) fromPage ++
-            while (data [toPage   * PAGESIZE] !== undefined && fromPage < toPage)   toPage --
+            while (data [fromPage * postData.limit] !== undefined && fromPage < toPage) fromPage ++
+            while (data [toPage   * postData.limit] !== undefined && fromPage < toPage)   toPage --
 
-            if (fromPage > toPage || ((fromPage == toPage) && data[fromPage * PAGESIZE] !== undefined)) {
+            if (fromPage > toPage || ((fromPage == toPage) && data[fromPage * postData.limit] !== undefined)) {
                 onDataLoaded.notify ({from: from, to: to})
                 return;
             }
 
-            postData.offset = fromPage * PAGESIZE
-            postData.limit  = PAGESIZE
+            postData.offset = fromPage * postData.limit
 
             h_request = setTimeout (function () {
 
-                for (var i = fromPage; i <= toPage; i ++) data [i * PAGESIZE] = null
+                for (var i = fromPage; i <= toPage; i ++) data [i * postData.limit] = null
 
                 onDataLoading.notify ({from: from, to: to});
 
