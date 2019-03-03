@@ -4,7 +4,6 @@
     
         var PAGESIZE = 50
         var data = {length: 0}
-        var searchstr = ""
         var sortcol = null
         var sortdir = 1
         var h_request = null
@@ -110,8 +109,18 @@
         }
 
         function setSearch (str) {
-          searchstr = str
-          clear ()
+        
+            if (str) {
+                postData.searchLogic = 'OR'
+                postData.search = [{field: "label", value: str}]
+            }            
+            else {
+                delete postData.searchLogic
+                delete postData.search
+            }
+            
+            clear ()
+            
         }
 
         init ()
@@ -119,6 +128,7 @@
         return {
 
           data: data,
+          postData: postData,
 
           clear: clear,
           isDataLoaded: isDataLoaded,
