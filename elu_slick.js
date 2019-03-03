@@ -102,10 +102,17 @@
             ensureData (from, to);
         }
 
-        function setSort (column, dir) {
-            sortcol = column
-            sortdir = dir
+        function setSort (field, dir) {
+
+            if (field) {
+                postData.sort = [{field: field, direction: dir > 0 ? 'asc' : 'desc'}]
+            }
+            else {
+                delete postData.sort
+            }
+
             clear ()
+
         }
 
         function setSearch (str) {
