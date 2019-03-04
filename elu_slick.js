@@ -1,5 +1,22 @@
 (function ($) {
 
+    $.fn.draw_table = function (o) {
+    
+        $.each (o.columns, function () {
+        
+            if (!this.id) this.id = this.field
+            
+            if (this.voc) {            
+                var voc = this.voc                
+                this.formatter = function (r, c, v) {return voc [v]}                
+            }
+
+        })
+
+        return new Slick.Grid (this, o.data, o.columns, o)
+
+    }
+
     function RemoteModel (tia, postData) {
     
         if (!postData) postData = {}
