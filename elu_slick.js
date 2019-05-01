@@ -2,18 +2,56 @@
 
     $.fn.draw_table = function (o) {
     
-        $.each (o.columns, function () {
-        
-            if (!this.id) this.id = this.field
-            
-            if (this.voc) {            
-                var voc = this.voc                
-                this.formatter = function (r, c, v) {return voc [v]}                
-            }
-
+        $.extend (o, {
+            headerRowHeight: 30,    
+            rowHeight: 30,
+            enableCellNavigation: true,
+            enableColumnReorder: false,
+            forceFitColumns: true,                
         })
+    
+        let loader = !o.url ? null : new Slick.Data.RemoteModel (o.url)
 
-        return new Slick.Grid (this, o.data, o.columns, o)
+        if (loader) o.data = loader.data
+
+        if (o.columns) for (let c of o.columns) {
+            if (!c.id) c.id = c.field            
+            if (c.voc) c.formatter = (r, _, v) => c.voc [v]
+        }
+    
+        let grid = new Slick.Grid (this, o.data, o.columns, o)
+        
+        if (o.onDblClick) grid.onDblClick.subscribe (o.onDblClick)
+        
+        grid.refresh = () => grid.onViewportChanged.notify ()
+
+        if (loader) {
+        
+            grid.loader = loader
+
+            loader.onDataLoaded.subscribe (function (e, args) {
+                for (var i = args.from; i <= args.to; i ++) grid.invalidateRow (i)
+                grid.updateRowCount ()
+                grid.render ()
+            })        
+            
+            grid.onViewportChanged.subscribe (function (e, args) {
+                var vp = grid.getViewport ()
+                loader.ensureData (vp.top, vp.bottom)
+            })
+
+            grid.onSort.subscribe (function (e, args) {
+                loader.setSort (args.sortCol.field, args.sortAsc ? 1 : -1)
+                grid.refresh ()
+            })
+
+        }
+                
+        $(window).on ('resize', function (e) {grid.resizeCanvas ()})
+        
+        setTimeout (grid.refresh, 0) // load the first page
+
+        return grid
 
     }
 
