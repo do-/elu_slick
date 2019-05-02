@@ -6,7 +6,7 @@
             headerRowHeight: 30,    
             rowHeight: 30,
             enableCellNavigation: true,
-            enableColumnReorder: false,
+//            enableColumnReorder: false,
             forceFitColumns: true,                
         })
     
