@@ -24,10 +24,15 @@
         if (o.onDblClick) grid.onDblClick.subscribe (o.onDblClick)
         
         grid.refresh = () => grid.onViewportChanged.notify ()
-
+        
         if (loader) {
         
             grid.loader = loader
+
+            grid.setFieldFilter = (s) => {
+                grid.loader.setSearch (s)
+                grid.refresh ()
+            }
 
             loader.onDataLoaded.subscribe (function (e, args) {
                 for (var i = args.from; i <= args.to; i ++) grid.invalidateRow (i)
@@ -58,7 +63,9 @@
     function RemoteModel (tia, postData) {
     
         if (!postData) postData = {}
-        if (!postData.limit) postData.limit = 50 
+        postData.searchLogic = 'AND'
+        if (!postData.search) postData.search = []
+        if (!postData.limit)  postData.limit = 50 
 
         var data = {length: 0}
         var sortcol = null
@@ -170,17 +177,16 @@
 
         }
 
-        function setSearch (str) {
+        function setSearch (s) {
         
-            if (str) {
-                postData.searchLogic = 'OR'
-                postData.search = [{field: "label", value: str}]
-            }            
-            else {
-                delete postData.searchLogic
-                delete postData.search
+            function apply (term) {
+                if (s == null) return []
+                let a = postData.search.filter ((i) => i.field != s.field)
+                if (s.value != null) a.push (s)
+                return a
             }
-            
+        
+            postData.search = apply (s)            
             clear ()
             
         }
