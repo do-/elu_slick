@@ -6,10 +6,11 @@
             headerRowHeight: 30,    
             rowHeight: 30,
             enableCellNavigation: true,
-//            enableColumnReorder: false,
-            forceFitColumns: true,                
+            forceFitColumns: true, 
         })
-    
+
+        if (!o.searchInputs) o.searchInputs = []
+        
         let loader = !o.url ? null : new Slick.Data.RemoteModel (o.url)
 
         if (loader) o.data = loader.data
@@ -28,6 +29,42 @@
         if (loader) {
         
             grid.loader = loader
+            
+            function toSearch ($input) {
+            
+                function op (tag) {switch (tag) {
+                    case 'INPUT': return 'begins'
+                    default: return 'is'
+                }}
+                
+                function val () {
+                    let v = $input.val ()
+                    if (v === '') return null
+                    return v
+                }
+            
+                return {
+                    field: $input.attr ('data-field') || $input.attr ('name'), 
+                    value: val (),
+                    operator: $input.attr ('data-op') || op ($input.get (0).tagName),
+                }
+                
+            }                
+            
+            for (let i of o.searchInputs) {
+                let $i = $(i)
+                let tag = $i.get (0).tagName
+                if (tag == 'BUTTON') continue
+                loader.setSearch (toSearch ($i))
+                switch (tag) {
+                    case 'INPUT':
+                        $i.keyup ((e) => {if (e.which == 13) grid.setFieldFilter (toSearch ($i))})
+                        break
+                    case 'SELECT':
+                        $i.change ((e) => {grid.setFieldFilter (toSearch ($i))})
+                        break
+                }
+            }
 
             grid.setFieldFilter = (s) => {
                 grid.loader.setSearch (s)
