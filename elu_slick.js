@@ -61,7 +61,10 @@
                         $i.keyup ((e) => {if (e.which == 13) grid.setFieldFilter (toSearch ($i))})
                         break
                     case 'SELECT':
-                        $i.change ((e) => {grid.setFieldFilter (toSearch ($i))})
+                        $i.selectmenu ({
+                            width: true,
+                            change: () => {grid.setFieldFilter (toSearch ($i))}
+                        })
                         break
                 }
             }
