@@ -1,4 +1,19 @@
 (function ($) {
+    
+    (function(){
+
+        $.blockUI.defaults.message = null
+        $.blockUI.defaults.overlayCSS.opacity = 0.8
+        $.blockUI.defaults.overlayCSS.backgroundColor = '#fff'
+
+        let _do_apologize = $_DO.apologize
+        $_DO.apologize = function (o, fail) {
+            $('.blockUI').remove ()
+            _do_apologize (o, fail)
+        }
+
+    })();
+    
 
     $.fn.draw_table = function (o) {
     
@@ -254,4 +269,4 @@
 
     $.extend (true, window, {Slick: {Data: {RemoteModel: RemoteModel}}})
 
-})(jQuery)
+})(jQuery);
