@@ -15,6 +15,65 @@
     })();
     
 
+    $.fn.draw_form = function (data) {
+    
+        var $view = fill (this, data)
+        
+        let is_edit = (name) => {switch (name) {
+            case 'update':
+            case 'cancel':
+                return true
+            default:
+                return false
+        }}
+
+        let read_only = {
+        
+            off: () => {
+
+                $('button', $view).each (function () {
+                    if (!is_edit (this.name)) $(this).hide (); else $(this).show ()
+                })
+                
+                $(':input', $view).not ('button').each (function () {
+                    $(this).prop ({disabled: 0})
+                })
+
+            },
+            
+            on: () => {
+
+                $('button', $view).each (function () {
+                    if (is_edit (this.name)) $(this).hide (); else $(this).show ()
+                })
+                
+                $(':input', $view).not ('button').each (function () {
+                    $(this).prop ({disabled: 1})
+                })
+
+            },
+
+            again: (e) => {
+
+                if (!confirm ('Отменить внесённые изменения?')) return
+
+                refill (data, $(e.target).parent ().prev ())
+
+                read_only.on ()
+
+            }
+
+        }
+
+        clickOn ($('button[name=edit]', $view), read_only.off)
+        clickOn ($('button[name=cancel]', $view), read_only.again)
+
+        read_only.on ()
+        
+        return $view
+        
+    }
+    
     $.fn.draw_table = function (o) {
     
         $.extend (o, {
