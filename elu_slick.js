@@ -93,7 +93,7 @@
             if (!c.id) c.id = c.field            
             if (c.voc) c.formatter = (r, _, v) => c.voc [v]
         }
-    
+
         let grid = new Slick.Grid (this, o.data, o.columns, o)
         
         if (o.onDblClick) grid.onDblClick.subscribe (o.onDblClick)
@@ -245,12 +245,17 @@
 
                 .done (function (d) {
 
-                    var c       = d.content       ; delete c.portion
-                    data.length = parseInt (c.cnt); delete c.cnt
+                    let c = d.content
+                    
+                    delete c.portion
 
-                    var l; for (var k in c) l = c [k]
+                    let cnt = c.cnt; delete c.cnt
+                    
+                    let l; for (let k in c) l = c [k]; let len = l.length
 
-                    for (var i = 0; i < l.length; i ++) {
+                    data.length = parseInt (cnt) || len
+
+                    for (var i = 0; i < len; i ++) {
                         var r = l [i]
                         r.index = from + i
                         data [from + i] = r
@@ -258,7 +263,7 @@
 
                     req = null
 
-                    onDataLoaded.notify ({from: from, to: to})
+                    onDataLoaded.notify ({from, to})
 
                 })
 
