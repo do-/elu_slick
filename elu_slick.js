@@ -334,3 +334,17 @@
     $.extend (true, window, {Slick: {Data: {RemoteModel: RemoteModel}}})
 
 })(jQuery);
+
+function add_vocabularies (data, o) {
+
+    for (var name in o) {
+
+        var raw = data [name]; if (!raw) continue
+
+        var idx = {items: raw.filter (function (r) {var f = r.fake; return !f || parseInt (f) == 0})}; $.each (raw, function () {idx [this.id] = this.text = this.label})
+
+        data [name] = idx
+
+    }
+
+}
