@@ -100,6 +100,11 @@
         
         grid.refresh = () => grid.onViewportChanged.notify ()
         
+        grid.reload = () => {
+            loader.clear ()
+            grid.refresh ()
+        }
+        
         if (loader) {
         
             grid.loader = loader
@@ -148,10 +153,11 @@
                 grid.refresh ()
             }
 
-            loader.onDataLoaded.subscribe (function (e, args) {
+            loader.onDataLoaded.subscribe ((e, args) => {
                 for (var i = args.from; i <= args.to; i ++) grid.invalidateRow (i)
                 grid.updateRowCount ()
                 grid.render ()
+                this.unblock ()
             })        
             
             grid.onViewportChanged.subscribe (function (e, args) {
@@ -169,6 +175,8 @@
         $(window).on ('resize', function (e) {grid.resizeCanvas ()})
         
         setTimeout (grid.refresh, 0) // load the first page
+        
+        this.data ('grid', grid)
 
         return grid
 
