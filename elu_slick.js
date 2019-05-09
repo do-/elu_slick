@@ -27,12 +27,22 @@
                 return false
         }}
 
+        let is_visible = (name, is_ro) => {
+
+            if (name == 'undelete') return data.is_deleted
+
+            if (data.is_deleted) return false
+
+            return is_ro ? !is_edit (name) : is_edit (name)
+
+        }
+
         let read_only = {
         
             off: () => {
 
                 $('button', $view).each (function () {
-                    if (!is_edit (this.name)) $(this).hide (); else $(this).show ()
+                    if (is_visible (this.name, 0)) $(this).show (); else $(this).hide ()
                 })
                 
                 $(':input', $view).not ('button').each (function () {
@@ -44,7 +54,7 @@
             on: () => {
 
                 $('button', $view).each (function () {
-                    if (is_edit (this.name)) $(this).hide (); else $(this).show ()
+                    if (is_visible (this.name, 1)) $(this).show (); else $(this).hide ()
                 })
                 
                 $(':input', $view).not ('button').each (function () {
