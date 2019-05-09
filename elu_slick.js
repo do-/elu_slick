@@ -88,6 +88,11 @@
         let loader = !o.url ? null : new Slick.Data.RemoteModel (o.url)
 
         if (loader) o.data = loader.data
+        
+        if (!o.data.getItemMetadata) o.data.getItemMetadata = o.getItemMetadata || function (row) {
+            let r = o.data [row]            
+            if (r.is_deleted) return {cssClasses: 'deleted'}
+        }
 
         if (o.columns) for (let c of o.columns) {
             if (!c.id) c.id = c.field            
@@ -206,7 +211,7 @@
         }
 
         function clear () {
-            for (k in data) delete data [k]
+            for (k in data) if (k != 'getItemMetadata') delete data [k]
             data.length = 0
         }
 
