@@ -100,7 +100,8 @@
         if (loader) o.data = loader.data
         
         if (!o.data.getItemMetadata) o.data.getItemMetadata = o.getItemMetadata || function (row) {
-            let r = o.data [row]            
+            let r = o.data [row]
+            if (r == null) return 
             if (r.is_deleted) return {cssClasses: 'deleted'}
         }
 
