@@ -113,6 +113,7 @@
         let grid = new Slick.Grid (this, o.data, o.columns, o)
         
         if (o.onDblClick) grid.onDblClick.subscribe (o.onDblClick)
+        if (o.onKeyDown)  grid.onKeyDown.subscribe (o.onKeyDown)
         
         grid.refresh = () => grid.onViewportChanged.notify ()
         
