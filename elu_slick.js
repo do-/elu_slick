@@ -205,12 +205,14 @@
         postData.searchLogic = 'AND'
         if (!postData.search) postData.search = []
         if (!postData.limit)  postData.limit = 50 
+        
+        function page (n) {
+            return Math.floor (n / postData.limit)
+        }
 
         var data = {length: 0}
         var sortcol = null
         var sortdir = 1
-        var h_request = null
-        var req = null
         
         var onDataLoading = new Slick.Event ()
         var onDataLoaded  = new Slick.Event ()
@@ -221,6 +223,11 @@
             for (var i = from; i <= to; i ++) if (!data [i]) return false
             return true;
         }
+        
+        function isPageLoaded (p) {
+            let n = p * postData.limit
+            return isDataLoaded (n, n)
+        }
 
         function clear () {
             for (k in data) if (k != 'getItemMetadata') delete data [k]
@@ -228,37 +235,30 @@
         }
 
         function ensureData (from, to) {
-    
-            if (req) {
-                req.abort ()
-                for (var i = req.fromPage; i <= req.toPage; i ++)
-                data [i * postData.limit] = undefined
-            }
 
-            if (from < 0) from = 0
+            if (!(from >= 0)) from = 0
 
-            if (data.length > 0) to = Math.min (to, data.length - 1)
+            let len = data.length
+            if (to >= len) to = len - 1
 
-            var fromPage = Math.floor (from / postData.limit)
-            var toPage   = Math.floor (to   / postData.limit)
+            let fromPage = page (from)
+            let toPage   = page (to)
+            
+            while (fromPage < toPage && isPageLoaded (fromPage)) fromPage ++
+            while (fromPage < toPage && isPageLoaded (toPage))   toPage --
 
-            while (data [fromPage * postData.limit] !== undefined && fromPage < toPage) fromPage ++
-            while (data [toPage   * postData.limit] !== undefined && fromPage < toPage)   toPage --
+            if (fromPage == toPage && isPageLoaded (fromPage)) return
 
-            if (fromPage > toPage || ((fromPage == toPage) && data[fromPage * postData.limit] !== undefined)) {
-                onDataLoaded.notify ({from: from, to: to})
-                return;
-            }
+            from = postData.offset = fromPage * postData.limit
+            to   = (toPage + 1) * postData.limit - 1
 
-            postData.offset = fromPage * postData.limit
-
-            h_request = setTimeout (function () {
+            setTimeout (function () {
 
                 for (var i = fromPage; i <= toPage; i ++) data [i * postData.limit] = null
 
-                onDataLoading.notify ({from: from, to: to});
+                onDataLoading.notify ({from, to});
 
-                req = $.ajax (dynamicURL (tia), {
+                $.ajax (dynamicURL (tia), {
                     dataType:    'json',
                     method:      'POST',
                     processData: false,
@@ -286,8 +286,6 @@
                         data [from + i] = r
                     }
 
-                    req = null
-
                     onDataLoaded.notify ({from, to})
 
                 })
@@ -296,10 +294,7 @@
                     $_DO.apologize ({jqXHR: jqXHR, error: e}, fail)
                 })  
 
-                req.fromPage = fromPage;
-                req.toPage   = toPage;
-
-            }, 50)
+            }, 0)
 
         }
 
