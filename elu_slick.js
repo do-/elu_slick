@@ -137,7 +137,7 @@
             grid.toSearch = function ($input) {
             
                 function op (tag) {switch (tag) {
-                    case 'INPUT': return 'begins'
+                    case 'INPUT': return 'contains'
                     default: return 'is'
                 }}
                 
