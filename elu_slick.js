@@ -84,7 +84,13 @@
         
     }
     
-    $.fn.draw_table = function (o) {
+    $.fn.draw_table = function (o) {    
+    
+        if (!o.searchInputs) o.searchInputs = []
+        
+        if (o.showHeaderRow) {
+            o.explicitInitialization = true
+        }
     
         $.extend (o, {
             headerRowHeight: 30,    
@@ -92,8 +98,6 @@
             enableCellNavigation: true,
             forceFitColumns: true, 
         })
-
-        if (!o.searchInputs) o.searchInputs = []
         
         let loader = !o.url ? null : new Slick.Data.RemoteModel (o.url)
 
@@ -112,13 +116,17 @@
 
         let grid = new Slick.Grid (this, o.data, o.columns, o)
         
-        if (o.onDblClick) grid.onDblClick.subscribe (o.onDblClick)
-        if (o.onKeyDown)  grid.onKeyDown.subscribe (o.onKeyDown)
+        for (let i of [
+            'onDblClick',
+            'onKeyDown',
+            'onHeaderRowCellRendered',
+        ]) grid [i].subscribe (o [i])
         
         grid.refresh = () => grid.onViewportChanged.notify ()
         
         grid.reload = () => {
             loader.clear ()
+            grid.setData (loader.data, true)
             grid.refresh ()
         }
         
@@ -126,7 +134,7 @@
         
             grid.loader = loader
             
-            function toSearch ($input) {
+            grid.toSearch = function ($input) {
             
                 function op (tag) {switch (tag) {
                     case 'INPUT': return 'begins'
@@ -151,15 +159,15 @@
                 let $i = $(i)
                 let tag = $i.get (0).tagName
                 if (tag == 'BUTTON') continue
-                loader.setSearch (toSearch ($i))
+                loader.setSearch (grid.toSearch ($i))
                 switch (tag) {
                     case 'INPUT':
-                        $i.keyup ((e) => {if (e.which == 13) grid.setFieldFilter (toSearch ($i))})
+                        $i.keyup ((e) => {if (e.which == 13) grid.setFieldFilter (grid.toSearch ($i))})
                         break
                     case 'SELECT':
                         $i.selectmenu ({
                             width: true,
-                            change: () => {grid.setFieldFilter (toSearch ($i))}
+                            change: () => {grid.setFieldFilter (grid.toSearch ($i))}
                         })
                         break
                 }
@@ -167,7 +175,7 @@
 
             grid.setFieldFilter = (s) => {
                 grid.loader.setSearch (s)
-                grid.refresh ()
+                grid.reload ()
             }
 
             loader.onDataLoaded.subscribe ((e, args) => {
@@ -194,6 +202,8 @@
         setTimeout (grid.refresh, 0) // load the first page
         
         this.data ('grid', grid)
+        
+        if (o.explicitInitialization) grid.init ()
 
         return grid
 
