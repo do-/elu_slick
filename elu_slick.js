@@ -192,7 +192,7 @@
 
             grid.onSort.subscribe (function (e, args) {
                 loader.setSort (args.sortCol.field, args.sortAsc ? 1 : -1)
-                grid.refresh ()
+                grid.reload ()
             })
 
         }
