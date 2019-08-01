@@ -93,8 +93,8 @@
         }
     
         $.extend (o, {
-            headerRowHeight: 30,    
-            rowHeight: 30,
+            headerRowHeight: 26,    
+            rowHeight: 26,
             enableCellNavigation: true,
             forceFitColumns: true, 
         })
