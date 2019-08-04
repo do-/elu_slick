@@ -196,6 +196,35 @@
                     $ns.change (() => {grid.setFieldFilter (grid.toSearch ($ns))})
 
                 },
+                
+                list: (a, o) => {
+                
+                    if (o.voc) o.items = o.voc.items
+                                
+                    let $ns = $('<select>')
+                    
+                    let name = a.column.id
+                    
+                    $ns.attr ({name})
+
+                    if (o.empty) $('<option value="">').text (o.empty).appendTo ($ns)
+                    
+                    for (let i of o.items) $('<option>').attr ({value: i.id}).text (i.label).appendTo ($ns)
+                    
+                    let loader = grid.loader
+                    if (loader && loader.postData && loader.postData.search)
+                        for (let search of loader.postData.search)
+                            if (search.field == name)
+                                $ns.val (search.value)
+                    
+                    $ns.appendTo ($(a.node))
+                    
+                    $ns.selectmenu ({
+                        width: true,
+                        change: () => {grid.setFieldFilter (grid.toSearch ($ns))}
+                    })
+
+                },
 
             }            
 
