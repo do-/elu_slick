@@ -177,6 +177,27 @@
                 grid.loader.setSearch (s)
                 grid.reload ()
             }
+            
+            grid.colFilter = {
+
+                text: (a, o) => {
+                
+                    if (!o) o = {}
+                
+                    let $ns = $(`<input class=ui-widget>`)
+                    
+                    $ns.attr ({
+                        name: a.column.id,
+                        placeholder: o.title || a.column.name,
+                    })
+                    
+                    $ns.appendTo ($(a.node))
+                    
+                    $ns.change (() => {grid.setFieldFilter (grid.toSearch ($ns))})
+
+                },
+
+            }            
 
             loader.onDataLoaded.subscribe ((e, args) => {
                 for (var i = args.from; i <= args.to; i ++) grid.invalidateRow (i)
