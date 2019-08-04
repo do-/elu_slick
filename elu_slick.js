@@ -116,6 +116,12 @@
 
         let grid = new Slick.Grid (this, o.data, o.columns, o)
         
+        if (o.showHeaderRow && !o.onHeaderRowCellRendered) o.onHeaderRowCellRendered = (e, a) => {            
+            let filter = a.column.filter            
+            if (filter) return a.grid.colFilter [filter.type] (a, filter)
+            $(a.node).text ('\xa0')            
+        }
+        
         for (let i of [
             'onDblClick',
             'onKeyDown',
@@ -225,6 +231,68 @@
                     })
 
                 },
+
+                checkboxes: (a, o) => {
+                
+                    let name = a.column.id
+
+                    let $anode = $(a.node)
+                
+                    let $ns = fill ($(`                
+                        <span class="drw popup-form">
+                            <center>
+                                <table>
+                                    <tr data-list=items>
+                                        <td><input data-name=id type=checkbox>
+                                        <td data-text=label>
+                                </table>
+                            </center>
+                        </span>                
+                    `), o).attr ({title: o.title})
+
+                    function label (ids) {
+                        if (!ids || !ids.length) return '[не важно]'
+                        return ids.map (id => o.items.filter (it => it.id == id) [0].label)
+                    }                 
+
+                    let ids = null
+                    let loader = grid.loader
+                    if (loader && loader.postData && loader.postData.search) {
+                        for (let search of loader.postData.search) if (search.field == name) ids = search.value
+                    }
+
+                    $(`input`, $ns).prop ({checked: false})
+                    if (ids) for (let id of ids) $(`input[name=${id}]`, $ns).prop ({checked: true})
+
+                    $anode.text (label (ids)).click (() => {
+
+                        $ns.dialog ({
+
+                            modal:   true,
+                            close:   function () {$(this).dialog ("destroy")},
+                            buttons: [{text: 'Установить', click: function () {
+
+                                let ids = []
+
+                                $('input:checked', $(this)).each (function () {
+                                    ids.push (this.name)
+                                })
+
+                                if (!ids.length) ids = null
+
+                                $anode.text (label (ids))
+
+                                grid.setFieldFilter ({field: name, value: ids, operator: 'in'})
+
+                                $(this).dialog ("destroy")
+
+                            }}],
+
+                        }).dialog ("widget")
+
+                    })
+
+                }
 
             }            
 
