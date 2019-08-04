@@ -99,7 +99,7 @@
             forceFitColumns: true, 
         })
         
-        let loader = !o.url ? null : new Slick.Data.RemoteModel (o.url)
+        let loader = !o.url ? null : new Slick.Data.RemoteModel (o.url, o.postData)
 
         if (loader) o.data = loader.data
         
