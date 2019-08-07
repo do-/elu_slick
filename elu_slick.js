@@ -116,10 +116,49 @@
 
         let grid = new Slick.Grid (this, o.data, o.columns, o)
         
-        if (o.showHeaderRow && !o.onHeaderRowCellRendered) o.onHeaderRowCellRendered = (e, a) => {            
-            let filter = a.column.filter            
-            if (filter) return a.grid.colFilter [filter.type] (a, filter)
-            $(a.node).text ('\xa0')            
+        if (o.showHeaderRow) {
+        
+            let f = o.onHeaderRowCellRendered || ((e, a) => {            
+                let filter = a.column.filter            
+                if (filter) return a.grid.colFilter [filter.type] (a, filter)
+                $(a.node).text ('\xa0')            
+            })
+            
+            o.onHeaderRowCellRendered = (e, a) => {
+
+                f (e, a)
+
+                if (!loader) return
+
+                let col = a.column; if (!col.filter) return
+
+                let $anode = $(a.node)
+
+                let drop = $anode.data ('drop'); if (!drop) return
+
+                $anode
+                
+                .mouseenter (() => {
+                
+                    var s = loader.postData.search.filter (i => i.field == col.id)
+                    
+                    if (!s.length || s [0].value == null) return
+                    
+                    let $b = $('<div class=drop-filter>').appendTo ($anode).click ((e) => {
+                        blockEvent (e)
+                        grid.setFieldFilter ({field: col.id})
+                        $b.remove ()
+                        drop ()
+                    })
+
+                })
+                
+                .mouseleave (() => {
+                    $('.drop-filter', $anode).remove ()
+                })
+
+            }
+            
         }
         
         for (let i of [
@@ -201,6 +240,8 @@
                     
                     $ns.change (() => {grid.setFieldFilter (grid.toSearch ($ns))})
 
+                    $(a.node).data ('drop', () => {$ns.val ('')})
+
                 },
                 
                 list: (a, o) => {
@@ -213,7 +254,16 @@
                     
                     $ns.attr ({name})
 
-                    if (o.empty) $('<option value="">').text (o.empty).appendTo ($ns)
+                    if (o.empty) {
+                    
+                        $('<option value="">').text (o.empty).appendTo ($ns)
+                    
+                        $(a.node).data ('drop', () => {
+                            $ns.val ('')
+                            $ns.selectmenu ("refresh")
+                        })
+                        
+                    }
                     
                     for (let i of o.items) $('<option>').attr ({value: i.id}).text (i.label).appendTo ($ns)
                     
@@ -229,7 +279,7 @@
                         width: true,
                         change: () => {grid.setFieldFilter (grid.toSearch ($ns))}
                     })
-
+                    
                 },
 
                 checkboxes: (a, o) => {
@@ -291,6 +341,8 @@
                         }).dialog ("widget")
 
                     })
+                    
+                    $anode.data ('drop', () => {$anode.text (label (null))})
 
                 }
 
