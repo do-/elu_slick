@@ -292,6 +292,9 @@
                         <span class="drw popup-form">
                             <center>
                                 <table>
+                                    <tr>
+                                        <td><input class=all type=checkbox>
+                                        <td>[ВСЕ]
                                     <tr data-list=items>
                                         <td><input data-name=id type=checkbox>
                                         <td data-text=label>
@@ -299,6 +302,19 @@
                             </center>
                         </span>                
                     `), o).attr ({title: o.title})
+                    
+                    $('input', $ns).change ((e) => {
+                        
+                        let c = e.target
+                    
+                        if (c.name) {
+                            $('input.all', $ns).prop ({checked: false})
+                        }
+                        else {
+                            $('input', $ns).prop ({checked: c.checked})
+                        }
+
+                    })
 
                     function label (ids) {
                         if (!ids || !ids.length) return '[не важно]'
