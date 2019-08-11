@@ -165,6 +165,7 @@
             'onDblClick',
             'onKeyDown',
             'onHeaderRowCellRendered',
+            'onContextMenu',
         ]) grid [i].subscribe (o [i])
         
         grid.refresh = () => grid.onViewportChanged.notify ()
@@ -226,7 +227,7 @@
             grid.colFilter = {
 
                 text: (a, o) => {
-                
+
                     if (!o) o = {}
                 
                     let $ns = $(`<input class=ui-widget>`)
