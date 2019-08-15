@@ -167,6 +167,12 @@
             
         }
         
+        if (o.onRecordDblClick) {
+        
+        	o.onDblClick = (e, a) => o.onRecordDblClick (a.grid.getDataItem (a.row))
+        
+        }
+        
         for (let i of [
             'onDblClick',
             'onKeyDown',
