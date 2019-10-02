@@ -174,6 +174,7 @@
         }
         
         for (let i of [
+            'onClick',
             'onDblClick',
             'onKeyDown',
             'onHeaderRowCellRendered',
