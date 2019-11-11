@@ -49,6 +49,8 @@
                     $(this).prop ({disabled: 0})
                 })
 
+                $('*[autofocus]:visible', $view).focus ()
+                
             },
             
             on: () => {
