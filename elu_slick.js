@@ -14,7 +14,13 @@
 
     })();
     
-
+    $.fn.on_change = function (todo) {
+    	let p = this.parents ()
+    	let a = p [p.length - 1]
+    	todo.call (a, or_null (this.val ()))
+    	this.on ('change', function () {todo.call (a, or_null (this.value))})
+    }
+    
     $.fn.draw_form = function (data) {
     
         var $view = fill (this, data)
@@ -541,4 +547,10 @@ function add_vocabularies (data, o) {
 
     }
 
+}
+
+async function draw_form (name, data) {
+
+	return (await use.jq ('user')).draw_form (data)
+	
 }
