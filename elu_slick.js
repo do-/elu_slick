@@ -72,6 +72,10 @@
                 $(':input', $view).not ('button').each (function () {
                     $(this).prop ({disabled: 1})
                 })
+                
+				clickOn ($('button[name=edit]', $view), read_only.off)
+			
+				clickOn ($('button[name=cancel]', $view), read_only.again)
 
             },
 
@@ -79,19 +83,16 @@
 
                 if (!confirm ('Отменить внесённые изменения?')) return
 
-                refill (data, $(e.target).parent ().prev ())
+                refill (data, $(e.target).closest ('.drw.form'))
 
                 read_only.on ()
-
-            }
+                
+            },
 
         }
 
-        clickOn ($('button[name=edit]', $view), read_only.off)
-        clickOn ($('button[name=cancel]', $view), read_only.again)
-
         read_only.on ()
-        
+
         return $view
         
     }
