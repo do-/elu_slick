@@ -20,9 +20,13 @@
     	todo.call (a, or_null (this.val ()))
     	this.on ('change', function () {todo.call (a, or_null (this.value))})
     }
-    
+
+    $.fn.valid_data = function () {
+	    return values (this).actual ().validated ()
+    }
+
     $.fn.draw_form = function (data) {
-    
+
         var $view = fill (this, data)
         
         let is_edit = (name) => {switch (name) {
