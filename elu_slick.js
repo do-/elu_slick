@@ -551,6 +551,6 @@ function add_vocabularies (data, o) {
 
 async function draw_form (name, data) {
 
-	return (await use.jq ('user')).draw_form (data)
+	return (await use.jq (name)).draw_form (data)
 	
 }
