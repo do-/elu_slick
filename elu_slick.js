@@ -373,12 +373,15 @@
         }
                 
         $(window).on ('resize', function (e) {grid.resizeCanvas ()})
-        
-        setTimeout (grid.refresh, 0) // load the first page
-        
+                
         this.data ('grid', grid)
         
         if (o.explicitInitialization) grid.init ()
+        
+        setTimeout (() => {
+        	grid.resizeCanvas ()
+        	grid.refresh ()
+        }, 0)
 
         return grid
 
