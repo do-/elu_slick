@@ -138,14 +138,14 @@
         if (o.showHeaderRow) {
             o.explicitInitialization = true
         }
-    
-        $.extend (o, {
+        
+        o = Object.assign ({
             headerRowHeight: 26,    
             rowHeight: 26,
             enableCellNavigation: true,
             forceFitColumns: true, 
-        })
-
+        }, o)
+        
 		if (o.src) {
 			let src = Array.isArray (o.src) ? o.src : [o.src]
 			o.url = {type: src [0]}
