@@ -27,6 +27,22 @@
 
     $.fn.draw_form = function (data) {
 
+    	let _fields = data._fields; if (_fields) for (let _field of Object.values (_fields)) {
+
+    		let v = data [_field.name]
+    		
+    		if (v == null) v = ''; else v = '' + v
+    	
+    		switch (_field.TYPE_NAME) {
+    			case 'DATE':
+    				if (v.length > 10) v = v.slice (0, 10)
+    			break
+    		}
+    		
+    		data [_field.name] = v
+
+    	}
+
         var $view = fill (this, data)
         
         let is_edit = (name) => {switch (name) {
@@ -39,9 +55,9 @@
 
         let is_visible = (name, is_ro) => {
 
-            if (name == 'undelete') return data.is_deleted
+            if (name == 'undelete') return data.is_deleted == 1
 
-            if (data.is_deleted) return false
+            if (data.is_deleted == 1) return false
 
             return is_ro ? !is_edit (name) : is_edit (name)
 
@@ -125,7 +141,7 @@
         if (!o.data.getItemMetadata) o.data.getItemMetadata = o.getItemMetadata || function (row) {
             let r = o.data [row]
             if (r == null) return 
-            if (r.is_deleted) return {cssClasses: 'deleted'}
+            if (r.is_deleted == 1) return {cssClasses: 'deleted'}
         }
 
         if (o.columns) for (let c of o.columns) {
