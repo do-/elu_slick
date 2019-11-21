@@ -226,7 +226,10 @@
             'onKeyDown',
             'onHeaderRowCellRendered',
             'onContextMenu',
-        ]) grid [i].subscribe (o [i])
+        ]) {
+        	let h = o [i]
+        	if (h) grid [i].subscribe (h)
+        }
         
         grid.refresh = () => grid.onViewportChanged.notify ()
         
