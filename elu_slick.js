@@ -14,6 +14,24 @@
 
     })();
     
+    $.extend (true, window, {
+		Slick: {
+		
+			Formatters: {
+			
+		        "DDMMYYYY": function CheckmarkFormatter (row, cell, value, columnDef, dataContext) {
+		        	if (value == null || value.length < 10) return ''
+		        	value = value.slice (0, 10)
+		        	if (value.charAt (2) == '.') return value
+		        	return value.split ('-').reverse ().join ('.')
+		        },
+		        
+			}
+						
+		}
+		
+    })
+    
     $.fn.on_change = function (todo) {
     	let p = this.parents ()
     	let a = p [p.length - 1]
