@@ -162,12 +162,37 @@
             if (r.is_deleted == 1) return {cssClasses: 'deleted'}
         }
 
-        if (o.columns) for (let c of o.columns) {
-            if (!c.id) c.id = c.field            
-            if (c.voc) c.formatter = (r, _, v) => c.voc [v]
-        }
+		let plugins = []
+		let selectionModel = null
+
+		o.columns = (o.columns || []).map (c => {
+		
+			if (c.constructor.name == "CheckboxSelectColumn") {
+			
+				plugins.push (c)
+				
+				selectionModel = new Slick.RowSelectionModel ({})
+			
+				return c.getColumnDefinition ()
+			
+			}
+			else {
+			
+				if (!c.id) c.id = c.field
+
+				if (c.voc) c.formatter = (r, _, v) => c.voc [v]
+				
+				return c
+            
+			}
+		
+		}) 
 
         let grid = new Slick.Grid (this, o.data, o.columns, o)
+        
+		for (let plugin of plugins) grid.registerPlugin (plugin)
+		
+		if (selectionModel) grid.setSelectionModel (selectionModel)        
         
         if (o.showHeaderRow) {
         
@@ -226,6 +251,7 @@
             'onKeyDown',
             'onHeaderRowCellRendered',
             'onContextMenu',
+            'onSelectedRowsChanged',
         ]) {
         	let h = o [i]
         	if (h) grid [i].subscribe (h)
