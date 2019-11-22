@@ -138,13 +138,23 @@
         if (o.showHeaderRow) {
             o.explicitInitialization = true
         }
-        
+                
         o = Object.assign ({
-            headerRowHeight: 26,    
-            rowHeight: 26,
             enableCellNavigation: true,
             forceFitColumns: true, 
         }, o)
+        
+        if (!o.rowHeight) {
+			let $row = $('<div class=slick-row style="position:fixed;z-index:1000" />').prependTo (this)
+			o.rowHeight = $row.height ()
+			$row.remove ()
+        }
+        
+        if (!o.headerRowHeight) {
+			let $row = $('<div class=slick-headerrow style="position:fixed;z-index:1000" />').prependTo (this)
+			o.headerRowHeight = $row.height ()
+			$row.remove ()
+        }
         
 		if (o.src) {
 			let src = Array.isArray (o.src) ? o.src : [o.src]
