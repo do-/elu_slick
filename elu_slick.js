@@ -177,6 +177,8 @@
 
 		o.columns = (o.columns || []).map (c => {
 		
+			if (c.class) c = new c.class (c)
+		
 			if (c.constructor.name == "CheckboxSelectColumn") {
 			
 				plugins.push (c)
