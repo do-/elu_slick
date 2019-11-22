@@ -181,7 +181,7 @@
 			
 				plugins.push (c)
 				
-				selectionModel = new Slick.RowSelectionModel ({})
+				selectionModel = new Slick.RowSelectionModel ({selectActiveRow: false})
 			
 				return c.getColumnDefinition ()
 			
