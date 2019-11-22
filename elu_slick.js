@@ -619,6 +619,103 @@
 
 })(jQuery);
 
+(function ($) {
+
+  function handleKeydownLRNav(e) {
+    var cursorPosition = this.selectionStart;
+    var textLength = this.value.length;
+    if ((e.keyCode === $.ui.keyCode.LEFT && cursorPosition > 0) ||
+         e.keyCode === $.ui.keyCode.RIGHT && cursorPosition < textLength-1) {
+      e.stopImmediatePropagation();
+    }
+  }
+
+  function handleKeydownLRNoNav(e) {
+    if (e.keyCode === $.ui.keyCode.LEFT || e.keyCode === $.ui.keyCode.RIGHT) {	
+      e.stopImmediatePropagation();	
+    }	
+  }
+
+  function Input (args) {
+
+    var $input;
+    var defaultValue;
+    var scope = this;
+    
+    let col = args.column
+    
+    let attr = Object.assign ({
+    	type: 'text',
+	}, (col.input || {}))
+
+    this.init = function () {
+
+		$input = $("<input />")
+			.attr (attr)
+          	.appendTo (args.container)
+          	.on ("keydown.nav", args.grid.getOptions ().editorCellNavOnLRKeys ? handleKeydownLRNav : handleKeydownLRNoNav)
+          	.focus ()
+          	.select ()
+          	
+    }
+
+    this.destroy = function () {
+		$input.remove ()	
+    }
+
+    this.focus = function () {
+		$input.focus ()
+    }
+
+    this.getValue = function () {
+		return $input.val ()
+    }
+
+    this.setValue = function (val) {
+		$input.val (val)
+    }
+
+    this.loadValue = function (item) {
+      defaultValue = item [args.column.field] || "";
+      $input.val (defaultValue);
+      $input [0].defaultValue = defaultValue;
+      $input.select();
+    }
+
+    this.serializeValue = function () {
+      return $input.val();
+    }
+
+    this.applyValue = function (item, state) {
+      item[args.column.field] = state;
+    }
+
+    this.isValueChanged = function () {
+      return (!($input.val() == "" && defaultValue == null)) && ($input.val() != defaultValue);
+    }
+
+    this.validate = function () {
+      if (args.column.validator) {
+        var validationResults = args.column.validator($input.val());
+        if (!validationResults.valid) {
+          return validationResults;
+        }
+      }
+
+      return {
+        valid: true,
+        msg: null
+      };
+    };
+
+	this.init ()
+		
+  }
+  
+  $.extend (true, window, {Slick: {Editors: {Input}}})  
+
+})(jQuery)
+
 function add_vocabularies (data, o) {
 
     for (var name in o) {
