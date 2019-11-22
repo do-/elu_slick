@@ -264,6 +264,7 @@
             'onHeaderRowCellRendered',
             'onContextMenu',
             'onSelectedRowsChanged',
+            'onCellChange',
         ]) {
         	let h = o [i]
         	if (h) grid [i].subscribe (h)
