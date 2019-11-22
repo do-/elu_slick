@@ -599,3 +599,7 @@ async function draw_form (name, data) {
 	return (await use.jq (name)).draw_form (data)
 	
 }
+
+function close_popup () {
+	$('.ui-dialog-content').dialog ("close")
+}
