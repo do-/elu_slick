@@ -146,13 +146,13 @@
         
         if (!o.rowHeight) {
 			let $row = $('<div class=slick-row style="position:fixed;z-index:1000" />').prependTo (this)
-			o.rowHeight = $row.height ()
+			let h = $row.height (); if (h > 0) o.rowHeight = h
 			$row.remove ()
         }
         
         if (!o.headerRowHeight) {
 			let $row = $('<div class=slick-headerrow style="position:fixed;z-index:1000" />').prependTo (this)
-			o.headerRowHeight = $row.height ()
+			let h = $row.height (); if (h > 0) o.headerRowHeight = h
 			$row.remove ()
         }
         
