@@ -644,12 +644,12 @@
     
     let col = args.column
     
-    let attr = Object.assign ({
-    	type: 'text',
-	}, (col.input || {}))
-
     this.init = function () {
-
+    
+	    let attr = Object.assign ({type: 'text'}, (col.input || {}))
+	    
+	    this.type = attr.type
+	    
 		$input = $("<input />")
 			.attr (attr)
           	.appendTo (args.container)
@@ -674,9 +674,20 @@
     this.setValue = function (val) {
 		$input.val (val)
     }
+    
+    this.canonize = function (v) {
+
+    	if (v == null) return ''
+    	
+    	switch (this.type) {
+    		case 'date' : return v.slice (0, 10)
+    		default     : return v
+    	}
+    	
+    }
 
     this.loadValue = function (item) {
-      defaultValue = item [args.column.field] || "";
+      defaultValue = this.canonize (item [args.column.field])
       $input.val (defaultValue);
       $input [0].defaultValue = defaultValue;
       $input.select();
