@@ -666,7 +666,7 @@
           	.on ("keydown.nav", args.grid.getOptions ().editorCellNavOnLRKeys ? handleKeydownLRNav : handleKeydownLRNoNav)
           	.focus ()
           	.select ()
-          	
+          	                    	
     }
 
     this.destroy = function () {
@@ -718,7 +718,67 @@
 		
   }
   
-  $.extend (true, window, {Slick: {Editors: {Input}}})  
+  function Select (args) {
+
+    var $input
+    var defaultValue
+    
+    this.init = function () {
+    
+	    let col = args.column
+
+	    this.field = col.field
+	    	    
+		$input = $("<select />").appendTo (args.container)
+          	
+        if (col.empty) $('<option value="" />').text (col.empty).appendTo ($input)
+        if (col.voc) for (let i of col.voc.items) $('<option/>').attr ({value: i.id}).text (i.label).appendTo ($input)
+        
+        $input.change (() => args.grid.getEditorLock ().commitCurrentEdit ())
+          	          	
+    }
+
+    this.destroy = function () {
+		$input.remove ()	
+    }
+
+    this.focus = function () {
+		$input.focus ()
+    }
+    
+    this.canonize = function (v) {
+    	if (v == null) return ''
+		return v
+    }
+
+    this.loadValue = function (item) {    
+		$input.val (defaultValue = $input [0].defaultValue = this.canonize (item [this.field])).select ()
+    }
+
+    this.serializeValue = function () {
+    	let v = $input.val ()
+    	if (v == '') return null
+    	return v
+    }
+
+    this.applyValue = function (item, v) {
+		item [this.field] = v
+    }
+
+    this.isValueChanged = function () {
+		return $input.val () != defaultValue
+    }
+
+    this.validate = function () {
+    	let v = args.column.validator
+    	return v ? v ($input.val ()) : {valid: true, msg: null}
+    }
+
+	this.init ()
+		
+  }
+
+  $.extend (true, window, {Slick: {Editors: {Input, Select}}})  
 
 })(jQuery)
 
