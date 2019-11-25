@@ -203,6 +203,8 @@
 
         let grid = new Slick.Grid (this, o.data, o.columns, o)
         
+        this.data ('grid', grid)
+        
 		for (let plugin of plugins) grid.registerPlugin (plugin)
 		
 		if (selectionModel) grid.setSelectionModel (selectionModel)        
