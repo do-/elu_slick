@@ -647,14 +647,15 @@
 
   function Input (args) {
 
-    var $input;
-    var defaultValue;
-    var scope = this;
-    
-    let col = args.column
+    var $input
+    var defaultValue
     
     this.init = function () {
     
+	    let col = args.column
+	    
+	    this.field = col.field
+
 	    let attr = Object.assign ({type: 'text'}, (col.input || {}))
 	    
 	    this.type = attr.type
@@ -675,14 +676,6 @@
     this.focus = function () {
 		$input.focus ()
     }
-
-    this.getValue = function () {
-		return $input.val ()
-    }
-
-    this.setValue = function (val) {
-		$input.val (val)
-    }
     
     this.canonize = function (v) {
 
@@ -695,38 +688,31 @@
     	
     }
 
-    this.loadValue = function (item) {
-      defaultValue = this.canonize (item [args.column.field])
-      $input.val (defaultValue);
-      $input [0].defaultValue = defaultValue;
-      $input.select();
+    this.loadValue = function (item) {    
+		$input.val (defaultValue = $input [0].defaultValue = this.canonize (item [this.field])).select ()
     }
 
     this.serializeValue = function () {
-      return $input.val();
+    	let v = $input.val ()
+    	if (v == '') return null
+    	return v
     }
 
-    this.applyValue = function (item, state) {
-      item[args.column.field] = state;
+    this.applyValue = function (item, v) {
+		item [this.field] = v
     }
 
     this.isValueChanged = function () {
-      return (!($input.val() == "" && defaultValue == null)) && ($input.val() != defaultValue);
+		return $input.val () != defaultValue
     }
 
     this.validate = function () {
-      if (args.column.validator) {
-        var validationResults = args.column.validator($input.val());
-        if (!validationResults.valid) {
-          return validationResults;
-        }
-      }
 
-      return {
-        valid: true,
-        msg: null
-      };
-    };
+    	let v = args.column.validator
+
+    	return v ? v ($input.val ()) : {valid: true, msg: null}
+
+    }
 
 	this.init ()
 		
