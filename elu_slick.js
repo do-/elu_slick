@@ -142,7 +142,8 @@
         o = Object.assign ({
             enableCellNavigation: true,
             forceFitColumns: true, 
-        }, o)
+			autoEdit: false,
+		}, o)
         
         if (!o.rowHeight) {
 			let $row = $('<div class=slick-row style="position:fixed;z-index:1000" />').prependTo (this)
@@ -433,6 +434,10 @@
                 for (var i = args.from; i <= args.to; i ++) grid.invalidateRow (i)
                 grid.updateRowCount ()
                 grid.render ()
+                if (grid.getActiveCell () == null) {
+                	grid.setActiveCell (0, 0)
+                	grid.focus ()
+                }
                 this.unblock ()
             })        
             
@@ -445,6 +450,10 @@
                 loader.setSort (args.sortCol.field, args.sortAsc ? 1 : -1)
                 grid.reload ()
             })
+            
+			grid.onKeyDown.subscribe (function (e, args) {
+				if (e.which == 13 && !e.ctrlKey && !e.altKey && grid.getActiveCell ()) grid.onDblClick.notify (args, e, this)
+			})
 
         }
                 
