@@ -127,7 +127,7 @@
 
         }
 
-        read_only.on ()
+        if ($('button[name=edit]', $view).length * $('button[name=cancel]', $view).length > 0) read_only.on ()
 
         return $view
         
