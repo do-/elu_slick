@@ -49,6 +49,8 @@
 
     		let v = data [_field.name]
     		
+    		if (v instanceof Date) v = v.toJSON ()
+
     		if (v == null) v = ''; else v = '' + v
     	
     		switch (_field.TYPE_NAME) {
