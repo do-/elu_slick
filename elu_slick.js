@@ -807,5 +807,11 @@ async function draw_form (name, data) {
 }
 
 function close_popup () {
-	$('.ui-dialog-content').dialog ("close")
+
+    let $this = $('.ui-dialog').find ('.ui-dialog-content')
+
+    $this.dialog ('close')
+
+    $this.remove ()
+    
 }
