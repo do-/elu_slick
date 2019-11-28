@@ -340,7 +340,7 @@
                     let $ns = $(`<input class=ui-widget>`)
                     
                     $ns.attr ({
-                        name: a.column.id,
+                        'data-field': a.column.id,
                         placeholder: o.title || a.column.name,
                     })
                     
