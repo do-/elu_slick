@@ -43,12 +43,14 @@
 	    return values (this).actual ().validated ()
     }
     
-    $.fn.draw_popup = function (o = {}) {
+    $.fn.draw_popup = function (data, o = {}) {
+
+		var $view = fill (this, data)
            
     	if (!('modal' in o)) o.modal = true
     	for (let k of ['width', 'height']) if (!(k in o)) o [k] = this.attr (k)
-    	    	
-    	let d = this.dialog (o).on ('dialogclose', (e) => {$('.ui-dialog').remove (); blockEvent (e)})
+
+    	let d = $view.dialog (o).on ('dialogclose', (e) => {$('.ui-dialog').remove (); blockEvent (e)})
     
     	return d
 
