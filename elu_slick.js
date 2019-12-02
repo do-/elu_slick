@@ -42,6 +42,17 @@
     $.fn.valid_data = function () {
 	    return values (this).actual ().validated ()
     }
+    
+    $.fn.draw_popup = function (o = {}) {
+           
+    	if (!('modal' in o)) o.modal = true
+    	for (let k of ['width', 'height']) if (!(k in o)) o [k] = this.attr (k)
+    	    	
+    	let d = this.dialog (o).on ('dialogclose', (e) => {$('.ui-dialog').remove (); blockEvent (e)})
+    
+    	return d
+
+    }
 
     $.fn.draw_form = function (data) {
 
@@ -803,6 +814,12 @@ function add_vocabularies (data, o) {
 async function draw_form (name, data) {
 
 	return (await use.jq (name)).draw_form (data)
+	
+}
+
+async function draw_popup (name, data, o) {
+
+	return (await use.jq (name)).draw_popup (data, o)
 	
 }
 
