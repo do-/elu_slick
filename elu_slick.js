@@ -43,14 +43,46 @@
 	    return values (this).actual ().validated ()
     }
     
-    $.fn.draw_popup = function (data, o = {}) {
+    $.fn.draw_popup = function (o = {}) {
+    
+    	let buttons = []
+    
+		$('>button', this).each (function () {
 
-		var $view = fill (this, data)
-           
+			let b = {
+				text: $(this).text (), 
+				attr: {}
+			}
+			
+			for (let i of $._data (this, 'events').click) b.click = i.handler
+		
+			for (let a of this.attributes) {
+			
+				let k = a.name
+				let v = a.value
+				
+				switch (k) {
+					case 'name':
+						b.name = v
+						break
+					default: 
+						b.attr [k] = v
+				}
+				
+			}
+
+			buttons.push (b)
+			
+			$(this).remove ()
+		
+		})
+		
+		o.buttons = buttons
+
     	if (!('modal' in o)) o.modal = true
     	for (let k of ['width', 'height']) if (!(k in o)) o [k] = this.attr (k)
-
-    	let d = $view.dialog (o).on ('dialogclose', (e) => {$('.ui-dialog').remove (); blockEvent (e)})
+    	    	
+    	let d = this.dialog (o).on ('dialogclose', (e) => {$('.ui-dialog').remove (); blockEvent (e)})
     
     	return d
 
@@ -822,7 +854,7 @@ async function draw_form (name, data) {
 
 async function draw_popup (name, data, o) {
 
-	return (await use.jq (name)).draw_popup (data, o)
+	return (await draw_form (name, data)).draw_popup (o)
 	
 }
 
