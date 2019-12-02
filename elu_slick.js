@@ -172,7 +172,8 @@
         
 		if (o.src) {
 			let src = Array.isArray (o.src) ? o.src : [o.src]
-			o.url = {type: src [0]}
+			let [type, part] = src [0].split ('.')
+			o.url = {type, part, id: null}
 			if (src.length > 1) o.postData = src [1]
 		}
 
