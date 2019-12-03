@@ -93,10 +93,13 @@
     	let _fields = data._fields; if (_fields) for (let _field of Object.values (_fields)) {
 
     		let v = data [_field.name]
-    		
+            let type = _field.TYPE_NAME
+
     		if (v instanceof Date) v = v.toJSON ()
 
-    		if (v == null) v = ''; else v = '' + v
+            if (!/^(int|num)/i.test (type)) {
+                if (v == null) v = ''; else v = '' + v
+            }
     	
     		switch (_field.TYPE_NAME) {
     			case 'DATE':
