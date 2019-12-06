@@ -329,6 +329,30 @@
             grid.refresh ()
         }
         
+        grid.findDataItem = (r) => {
+        
+        	let data = grid.getData ()
+
+        	outer: for (let n in data) {
+        	
+        		if (isNaN (n)) continue
+
+        		let v = data [n]
+
+        		for (let k in r) {
+        			let s = r [k]
+        			if (typeof s == "function") continue         		
+        			if (s != v [k]) continue outer
+        		}
+        		
+        		return v
+        		
+        	}
+        	
+        	return {}
+
+        }        
+        
         if (loader) {
         
             grid.loader = loader
@@ -652,23 +676,23 @@
             clear ()
             
         }
-
+        
         init ()
 
         return {
 
-          data: data,
-          postData: postData,
+          data,
+          postData,
 
-          clear: clear,
-          isDataLoaded: isDataLoaded,
-          ensureData: ensureData,
-          reloadData: reloadData,
-          setSort: setSort,
-          setSearch: setSearch,
+          clear,
+          isDataLoaded,
+          ensureData,
+          reloadData,
+          setSort,
+          setSearch,
 
-          onDataLoading: onDataLoading,
-          onDataLoaded: onDataLoaded
+          onDataLoading,
+          onDataLoaded,
 
         }
     
