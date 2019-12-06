@@ -858,9 +858,15 @@ async function draw_popup (name, data, o) {
 	
 }
 
+function get_popup () {
+
+	return $('.ui-dialog-content')
+	
+}
+
 function close_popup () {
 
-    let $this = $('.ui-dialog').find ('.ui-dialog-content')
+    let $this = get_popup ()
 
     $this.dialog ('close')
 
