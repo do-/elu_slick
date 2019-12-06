@@ -508,7 +508,7 @@
                 for (var i = args.from; i <= args.to; i ++) grid.invalidateRow (i)
                 grid.updateRowCount ()
                 grid.render ()
-                if (grid.getActiveCell () == null) {
+                if (grid.getOptions ().enableCellNavigation && grid.getActiveCell () == null) {
                 	grid.setActiveCell (0, 0)
                 	grid.focus ()
                 }
