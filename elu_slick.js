@@ -835,6 +835,7 @@ $_DRAW._grid_filter_checkboxes = async function (data) {
 	let a = data.a
 	let grid = a.grid
 	let o = data.filter || {}
+	if (!o.items && a.column.voc) o.items = a.column.voc.items
 	
 	let name = a.column.id
 
