@@ -179,19 +179,18 @@
     }
     
     $.fn.draw_table = function (o) {    
-    
-        if (!o.searchInputs) o.searchInputs = []
-        
-        if (o.showHeaderRow) {
-            o.explicitInitialization = true
-        }
-                
+                    
         o = Object.assign ({
             enableCellNavigation: true,
             forceFitColumns: true, 
 			autoEdit: false,
 		}, o)
         
+        for (let c of o.columns || []) if (c.filter) o.showHeaderRow = true
+        if (o.showHeaderRow) o.explicitInitialization = true
+
+        if (!o.searchInputs) o.searchInputs = []
+
         if (!o.rowHeight) {
 			let $row = $('<div class=slick-row style="position:fixed;z-index:1000" />').prependTo (this)
 			let h = $row.height (); if (h > 0) o.rowHeight = h
@@ -224,7 +223,7 @@
 		let plugins = []
 		let selectionModel = null
 
-		o.columns = (o.columns || []).map (c => {
+		o.columns = (o.columns || []).map (c => {	
 		
 			if (c.class) c = new c.class (c)
 		
