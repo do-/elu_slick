@@ -261,7 +261,7 @@
         
             let f = o.onHeaderRowCellRendered || ((e, a) => {            
                 let filter = a.column.filter            
-                if (filter) return a.grid.colFilter [filter.type] (a, filter)
+                if (filter) return grid.setColFilter (a, filter)
                 $(a.node).text ('\xa0')            
             })
             
@@ -275,12 +275,12 @@
 
                 let $anode = $(a.node)
 
-                let drop = $anode.data ('drop'); if (!drop) return
-
                 $anode
                 
                 .mouseenter (() => {
                 
+	                let drop = $anode.data ('drop'); if (!drop) return
+
                     var s = loader.postData.search.filter (i => i.field == col.id)
                     
                     if (!s.length || s [0].value == null) return
@@ -401,108 +401,9 @@
                 grid.reload ()
             }
             
-            grid.colFilter = {
-
-                text: (a, o) => {
-
-                    if (!o) o = {}
-                
-                    let $ns = $(`<input class=ui-widget>`)
-                    
-                    $ns.attr ({
-                        'data-field': a.column.id,
-                        placeholder: o.title || a.column.name,
-                    })
-                    
-                    $ns.appendTo ($(a.node))
-                    
-                    $ns.change (() => {grid.setFieldFilter (grid.toSearch ($ns))})
-
-                    $(a.node).data ('drop', () => {$ns.val ('')})
-
-                },
-                
-                checkboxes: (a, o) => {
-                
-                    let name = a.column.id
-
-                    let $anode = $(a.node)
-                
-                    let $ns = fill ($(`                
-                        <span class="drw popup-form">
-                            <center>
-                                <table>
-                                    <tr>
-                                        <td><input class=all type=checkbox>
-                                        <td>[ВСЕ]
-                                    <tr data-list=items>
-                                        <td><input data-name=id type=checkbox>
-                                        <td data-text=label>
-                                </table>
-                            </center>
-                        </span>                
-                    `), o).attr ({title: o.title})
-                    
-                    $('input', $ns).change ((e) => {
-                        
-                        let c = e.target
-                    
-                        if (c.name) {
-                            $('input.all', $ns).prop ({checked: false})
-                        }
-                        else {
-                            $('input', $ns).prop ({checked: c.checked})
-                        }
-
-                    })
-
-                    function label (ids) {
-                        if (!ids || !ids.length) return '[не важно]'
-                        return ids.map (id => o.items.filter (it => it.id == id) [0].label)
-                    }                 
-
-                    let ids = null
-                    let loader = grid.loader
-                    if (loader && loader.postData && loader.postData.search) {
-                        for (let search of loader.postData.search) if (search.field == name) ids = search.value
-                    }
-
-                    $(`input`, $ns).prop ({checked: false})
-                    if (ids) for (let id of ids) $(`input[name=${id}]`, $ns).prop ({checked: true})
-
-                    $anode.text (label (ids)).click (() => {
-
-                        $ns.dialog ({
-
-                            modal:   true,
-                            close:   function () {$(this).dialog ("destroy")},
-                            buttons: [{text: 'Установить', click: function () {
-
-                                let ids = []
-
-                                $('input:checked', $(this)).each (function () {
-                                    ids.push (this.name)
-                                })
-
-                                if (!ids.length) ids = null
-
-                                $anode.text (label (ids))
-
-                                grid.setFieldFilter ({field: name, value: ids, operator: 'in'})
-
-                                $(this).dialog ("destroy")
-
-                            }}],
-
-                        }).dialog ("widget")
-
-                    })
-                    
-                    $anode.data ('drop', () => {$anode.text (label (null))})
-
-                }
-
-            }            
+            grid.setColFilter = (a, filter) => {            
+            	show_block ('_grid_filter_' + filter.type, {a, filter})            	            
+            }
 
             loader.onDataLoaded.subscribe ((e, args) => {
                 for (var i = args.from; i <= args.to; i ++) grid.invalidateRow (i)
@@ -896,4 +797,120 @@ function close_popup () {
 
     $this.remove ()
     
+}
+
+////////////////////////////////////////////////////////////////////////////////
+
+$_GET._grid_filter_text = $_GET._grid_filter_checkboxes = async function (data) {
+
+	return data
+
+}
+
+////////////////////////////////////////////////////////////////////////////////
+
+$_DRAW._grid_filter_text = async function (data) {
+
+	let a = data.a
+	let o = data.filter || {}
+	
+    let $ns = $('<input class=ui-widget>')
+    
+    $ns.attr ({
+        'data-field': a.column.id,
+        placeholder: o.title || a.column.name,
+    })
+    
+    $ns.appendTo ($(a.node))
+    
+    $ns.change (() => {a.grid.setFieldFilter (a.grid.toSearch ($ns))})
+
+    $(a.node).data ('drop', () => {$ns.val ('')})
+
+}
+
+////////////////////////////////////////////////////////////////////////////////
+
+$_DRAW._grid_filter_checkboxes = async function (data) {
+
+	let a = data.a
+	let grid = a.grid
+	let o = data.filter || {}
+	
+	let name = a.column.id
+
+	let $anode = $(a.node)
+
+	let $ns = fill ($(`                
+		<span class="drw popup-form">
+			<center>
+				<table>
+					<tr>
+						<td><input class=all type=checkbox>
+						<td>[ВСЕ]
+					<tr data-list=items>
+						<td><input data-name=id type=checkbox>
+						<td data-text=label>
+				</table>
+			</center>
+		</span>                
+	`), o).attr ({title: o.title})
+
+	$('input', $ns).change ((e) => {
+
+		let c = e.target
+
+		if (c.name) {
+			$('input.all', $ns).prop ({checked: false})
+		}
+		else {
+			$('input', $ns).prop ({checked: c.checked})
+		}
+
+	})
+
+	function label (ids) {
+		if (!ids || !ids.length) return '[не важно]'
+		return ids.map (id => o.items.filter (it => it.id == id) [0].label)
+	}                 
+
+	let ids = null
+	let loader = grid.loader
+	if (loader && loader.postData && loader.postData.search) {
+		for (let search of loader.postData.search) if (search.field == name) ids = search.value
+	}
+
+	$(`input`, $ns).prop ({checked: false})
+	if (ids) for (let id of ids) $(`input[name=${id}]`, $ns).prop ({checked: true})
+
+	$anode.text (label (ids)).click (() => {
+
+		$ns.dialog ({
+
+			modal:   true,
+			close:   function () {$(this).dialog ("destroy")},
+			buttons: [{text: 'Установить', click: function () {
+
+				let ids = []
+
+				$('input:checked', $(this)).each (function () {
+					ids.push (this.name)
+				})
+
+				if (!ids.length) ids = null
+
+				$anode.text (label (ids))
+
+				grid.setFieldFilter ({field: name, value: ids, operator: 'in'})
+
+				$(this).dialog ("destroy")
+
+			}}],
+
+		}).dialog ("widget")
+
+	})
+
+	$anode.data ('drop', () => {$anode.text (label (null))})
+
 }
