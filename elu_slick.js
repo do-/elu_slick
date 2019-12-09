@@ -49,15 +49,16 @@
 
 		$('>button', this).each (function () {
 
-			let b = {
-				text: $(this).text (), 
-				attr: {}
-			}
-			
-			for (let i of $._data (this, 'events').click) b.click = i.handler
-		
+			let $this = $(this)
+
+			if ($this.css ('display') == 'none') return
+
+			let b = {text: $this.text (), attr: {}}
+
+			for (let i of $._data (this, 'events').click) b.click = i.handler					
+
 			for (let a of this.attributes) {
-			
+
 				let k = a.name; if (k == 'style') continue
 				let v = a.value
 				
