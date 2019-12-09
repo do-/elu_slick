@@ -46,7 +46,7 @@
     $.fn.draw_popup = function (o = {}) {
     
     	let buttons = []
-    
+
 		$('>button', this).each (function () {
 
 			let b = {
@@ -58,7 +58,7 @@
 		
 			for (let a of this.attributes) {
 			
-				let k = a.name
+				let k = a.name; if (k == 'style') continue
 				let v = a.value
 				
 				switch (k) {
