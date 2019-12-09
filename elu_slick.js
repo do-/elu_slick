@@ -202,7 +202,9 @@
 			let h = $row.height (); if (h > 0) o.headerRowHeight = h
 			$row.remove ()
         }
-        
+
+        if (this.height () == 0 && Array.isArray (o.data)) o.autoHeight = true
+
 		if (o.src) {
 			let src = Array.isArray (o.src) ? o.src : [o.src]
 			let [type, part] = src [0].split ('.')
