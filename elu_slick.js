@@ -44,8 +44,8 @@
     }
     
     $.fn.draw_popup = function (o = {}) {
-    
-    	let buttons = []
+
+    	let buttons = o.buttons || []
 
 		$('>button', this).each (function () {
 
