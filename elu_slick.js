@@ -45,6 +45,8 @@
     
     $.fn.draw_popup = function (o = {}) {
 
+    	if (this.is ('[noresize]')) o.resizable = false
+
     	let buttons = o.buttons || []
 
 		$('>button', this).each (function () {
