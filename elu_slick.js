@@ -54,8 +54,15 @@
 			if ($this.css ('display') == 'none') return
 
 			let b = {text: $this.text (), attr: {}}
-
-			for (let i of $._data (this, 'events').click) b.click = i.handler					
+			
+			let events = $._data (this, 'events')
+			
+			if (events) {
+				for (let i of events.click) b.click = i.handler
+			}
+			else {
+				darn (['No event handler is set for this button', this])
+			}
 
 			for (let a of this.attributes) {
 
