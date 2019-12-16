@@ -92,7 +92,7 @@
     	if (!('modal' in o)) o.modal = true
     	for (let k of ['width', 'height']) if (!(k in o)) o [k] = this.attr (k)
     	    	
-    	let d = this.dialog (o).on ('dialogclose', (e) => {$('.ui-dialog').remove (); blockEvent (e)})
+        let d = this.dialog (o).on ('dialogclose', (e) => {$(this).closest('.ui-dialog').remove (); blockEvent (e)})
     
     	return d
 
@@ -796,7 +796,7 @@ async function draw_popup (name, data, o) {
 
 function get_popup () {
 
-	return $('.ui-dialog-content')
+    return $('body .ui-dialog:last .ui-dialog-content')
 	
 }
 
