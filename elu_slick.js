@@ -788,7 +788,7 @@ async function draw_form (name, data) {
 	
 }
 
-async function draw_popup (name, data, o) {
+async function draw_popup (name, data, o = {}) {
 
 	if (!('dialogClass' in o)) o.dialogClass = name
 
