@@ -790,6 +790,8 @@ async function draw_form (name, data) {
 
 async function draw_popup (name, data, o) {
 
+	if (!('dialogClass' in o)) o.dialogClass = name
+
 	return (await draw_form (name, data)).draw_popup (o)
 	
 }
