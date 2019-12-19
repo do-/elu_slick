@@ -33,10 +33,13 @@
     })
     
     $.fn.on_change = function (todo) {
-    	let p = this.parents ()
-    	let a = p [p.length - 1]
-    	todo.call (a, or_null (this.val ()))
-    	this.on ('change', function () {todo.call (a, or_null (this.value))})
+    	this.each (function () {
+    		let $this = $(this)
+			let p = $this.parents ()
+			let a = p [p.length - 1]
+			todo.call (a, or_null ($this.val ()))
+			$this.on ('change', function () {todo.call (a, or_null (this.value))})
+    	})
     }
 
     $.fn.valid_data = function () {
