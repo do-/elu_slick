@@ -322,6 +322,30 @@
         
         }
         
+        if (o.onCellChange) {
+        
+        	let todo = o.onCellChange
+        	
+        	o.onCellChange = async (e, a) => {
+        
+				let defaultValue = grid.getCellEditor ().defaultValue
+
+				let field = grid.getColumns () [a.cell].field
+
+				try {
+					await todo (e, a)
+				}
+				catch (x) {
+					Slick.GlobalEditorLock.cancelCurrentEdit ()
+					grid.getData () [a.row] [field] = defaultValue
+					grid.invalidateRow (a.row)
+					grid.render ()
+				}
+
+			}
+        
+        }
+        
         for (let i of [
             'onClick',
             'onDblClick',
@@ -678,7 +702,9 @@
     }
 
     this.loadValue = function (item) {    
-		$input.val (defaultValue = $input [0].defaultValue = this.canonize (item [this.field])).select ()
+    	let v = this.canonize (item [this.field])
+    	if (defaultValue == null) defaultValue = this.defaultValue = $input [0].defaultValue = v
+		$input.val (v).select ()
     }
 
     this.serializeValue = function () {
@@ -741,7 +767,9 @@
     }
 
     this.loadValue = function (item) {    
-		$input.val (defaultValue = $input [0].defaultValue = this.canonize (item [this.field])).select ()
+    	let v = this.canonize (item [this.field])
+    	if (defaultValue == null) defaultValue = this.defaultValue = $input [0].defaultValue = v
+		$input.val (v).select ()
     }
 
     this.serializeValue = function () {
