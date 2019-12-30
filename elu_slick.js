@@ -491,7 +491,7 @@
         postData.searchLogic = 'AND'
         if (!postData.search) postData.search = []
         if (!postData.limit)  postData.limit = 50 
-        
+                
         function page (n) {
             return Math.floor (n / postData.limit)
         }
@@ -519,6 +519,26 @@
             for (k in data) if (k != 'getItemMetadata') delete data [k]
             data.length = 0
         }
+        
+        async function each (cb) {
+
+			let pd = clone (postData); pd.offset = 0
+
+			let i = 0
+
+			let len = data.length; while (pd.offset < len) {
+
+				let d = await response (tia, pd); for (let k of ['portion', 'cnt']) delete d [k]
+				
+                let l; for (let k in d) l = d [k]
+
+				for (let r of l) cb.call (r, i ++)
+
+				pd.offset += pd.limit
+
+			}
+
+        }        
 
         function ensureData (from, to) {
 
@@ -620,6 +640,7 @@
 
         return {
 
+          each,
           data,
           postData,
 
