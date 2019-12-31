@@ -936,87 +936,194 @@ $_DRAW._grid_filter_text = async function (data) {
 
 ////////////////////////////////////////////////////////////////////////////////
 
-$_DRAW._grid_filter_checkboxes = async function (data) {
+$_GET._grid_filter_checkboxes = async function (data) {
 
 	let a = data.a
 	let grid = a.grid
 	let o = data.filter || {}
 	if (!o.items && a.column.voc) o.items = a.column.voc.items
+
+	data.get_ids = function () {
+	
+		let loader = grid.loader; if (!loader || !loader.postData || !loader.postData.search) return null
+
+		for (let search of loader.postData.search) 
+			if (search.field == a.column.id) 
+				return search.value
+
+	}                 
+
+	data.set_ids = function (ids) {
+
+		$(a.node).text (data.label (ids))
+
+		grid.setFieldFilter ({
+			field:    a.column.id, 
+			operator: 'in',
+			value:    ids, 
+		})
+
+	}
+	
+	return data
+
+}
+
+////////////////////////////////////////////////////////////////////////////////
+
+$_DRAW._grid_filter_checkboxes = async function (data) {
+
+	let o = data.filter
+	let a = data.a
+	let grid = a.grid
 	
 	let name = a.column.id
 
 	let $anode = $(a.node)
 
-	let $ns = fill ($(`                
-		<span class="drw popup-form">
-			<center>
-				<table>
-					<tr>
-						<td><input class=all type=checkbox>
-						<td>[ВСЕ]
-					<tr data-list=items>
-						<td><input data-name=id type=checkbox>
-						<td data-text=label>
-				</table>
-			</center>
-		</span>                
-	`), o).attr ({title: o.title})
-
-	$('input', $ns).change ((e) => {
-
-		let c = e.target
-
-		if (c.name) {
-			$('input.all', $ns).prop ({checked: false})
-		}
-		else {
-			$('input', $ns).prop ({checked: c.checked})
-		}
-
-	})
-
-	function label (ids) {
+	data.label = function (ids) {
 		if (!ids || !ids.length) return '[не важно]'
-		return ids.map (id => o.items.filter (it => it.id == id) [0].label)
+		return ids.map (id => o.items.filter (it => it.id == id) [0].label).join (', ')
 	}                 
+	
+	$anode
+		.text  (data.label (data.get_ids ()))
+		.click (() => show_block ('_grid_filter_checkboxes_popup', data))
+		.data  ('drop', () => {$anode.text (data.label (null))})
 
-	let ids = null
-	let loader = grid.loader
-	if (loader && loader.postData && loader.postData.search) {
-		for (let search of loader.postData.search) if (search.field == name) ids = search.value
-	}
+}
 
-	$(`input`, $ns).prop ({checked: false})
-	if (ids) for (let id of ids) $(`input[name=${id}]`, $ns).prop ({checked: true})
+////////////////////////////////////////////////////////////////////////////////
 
-	$anode.text (label (ids)).click (() => {
+$_DO.set_all__grid_filter_checkboxes_popup = async function (e) {
 
-		$ns.dialog ({
+	let grid = $("#grid_options").data ('grid')
 
-			modal:   true,
-			close:   function () {$(this).dialog ("destroy")},
-			buttons: [{text: 'Установить', click: function () {
+	grid.setSelectedRows (Array.from (Array (grid.getData ().length).keys ()))
 
-				let ids = []
+}
 
-				$('input:checked', $(this)).each (function () {
-					ids.push (this.name)
-				})
+////////////////////////////////////////////////////////////////////////////////
 
-				if (!ids.length) ids = null
+$_DO.clear_all__grid_filter_checkboxes_popup = async function (e) {
 
-				$anode.text (label (ids))
+	$("#grid_options").data ('grid').setSelectedRows ([])
 
-				grid.setFieldFilter ({field: name, value: ids, operator: 'in'})
+}
 
-				$(this).dialog ("destroy")
+////////////////////////////////////////////////////////////////////////////////
 
-			}}],
+$_DO.update__grid_filter_checkboxes_popup = async function (e) {
 
-		}).dialog ("widget")
+	let grid = $("#grid_options").data ('grid')
 
+	let ids = grid.getSelectedRows ().map (i => grid.getDataItem (i).id)
+
+	if (!ids.length) ids = null
+
+	get_popup ().data ('data').set_ids (ids)
+
+	close_popup ()
+
+}
+
+////////////////////////////////////////////////////////////////////////////////
+
+$_GET._grid_filter_checkboxes_popup = async function (data) {
+
+	delete data._can
+
+	return data
+
+}
+
+////////////////////////////////////////////////////////////////////////////////
+
+$_DRAW._grid_filter_checkboxes_popup = async function (o) {
+
+	let filter = o.filter
+
+    let $view = $(`
+    
+		<span class="drw popup-form">
+
+			<style>
+
+				#grid_options {
+					border: solid #ccc 1px;
+					width: 100%;
+				}
+
+				#grid_options input[type=checkbox] {
+					height: 13px;
+					width: 13px;
+				}
+
+			</style>
+
+			<div id="grid_options" class="drw table" />
+
+			<button name=set_all>Все</button>
+			<button name=clear_all>Очистить</button>
+			<button name=update>Установить</button>
+
+		</span>
+
+	`)
+
+	$('button', $view).attr ({'data-block-name': '_grid_filter_checkboxes_popup'})
+
+	$view.data ('data', o)
+	$view.setup_buttons ()
+
+	$view.draw_popup ({
+		title: filter.title,
+		width: 400,
+		maxHeight: filter.maxHeight || 400,
 	})
 
-	$anode.data ('drop', () => {$anode.text (label (null))})
+	let data = filter.items
+			
+    let grid = $("#grid_options", $view).draw_table ({
+
+        enableCellNavigation: false,
+
+        columns: [
+			{
+				hideInColumnTitleRow: true,
+				class: Slick.CheckboxSelectColumn,
+			},
+            {	
+            	field: "label", 
+            },
+        ],
+        
+        data: filter.items
+
+    })
+    
+    let $c = $(grid.getCanvasNode ())
+
+    let $p = $c.parent ().parent ().parent ().parent ()
+
+    if ($c.height () > $p.height ()) {
+
+    	grid.setOptions ({autoHeight: false})
+
+    	$("#grid_options", $view).height ($p.height () - 10)
+
+    	grid.resizeCanvas ()    
+
+    }
+
+  	let ids = o.get_ids (); if (ids && ids.length > 0) {
+
+		let idx  = {}; for (let id of o.get_ids () || []) idx [id] = 1
+
+		let rows = []; for (let i = 0; i < data.length; i ++) if (idx [data [i].id]) rows.push (i)
+
+		grid.setSelectedRows (rows)
+
+  	}
 
 }
