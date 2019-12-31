@@ -393,6 +393,8 @@
         
         if (loader) {
         
+        	grid.each = loader.each
+        
             grid.loader = loader
             
             grid.toSearch = function ($input) {
@@ -469,6 +471,61 @@
 			})
 
         }
+        else {
+
+			grid.each = async function (cb) {
+			
+				let data = grid.data
+
+				for (let i = 0; i < data.length; i ++) cb.call (data [i], i)
+
+			}        
+        
+        }
+        
+		grid.saveAsXLS = async function (fn, cb) {
+		
+			let cols = grid.getColumns ()
+
+			let html = '<html><head><meta charset=utf-8><style>td{mso-number-format:"\@"} td.n{mso-number-format:General}</style></head><body><table border>'
+
+			html += '<tr>'
+			for (let col of cols) html += '<th>' + col.name
+			html += '</tr>'
+						
+			await grid.each (function (row) {
+
+				html += '<tr>'
+				
+				for (let cell = 0; cell < cols.length; cell ++) {
+				
+					let columnDef = cols [cell]
+
+					html += '<td>'
+
+					let value = this [columnDef.field]
+					
+					let formatter = columnDef.formatter; if (formatter) {
+					
+						value = formatter (row, cell, value, columnDef, this)
+
+						if (typeof value === 'object' && 'text' in value) value = value.text
+						
+					}
+
+					if (value != null) html += value
+
+				}
+
+				if (cb) cb (row)
+
+			})
+			
+			html += '</table></body></html>'
+
+			html.saveAs (fn)
+		
+		}
                 
         $(window).on ('resize', function (e) {grid.resizeCanvas ()})
                 
