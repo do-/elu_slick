@@ -492,11 +492,8 @@
         if (!postData.search) postData.search = []
         if (!postData.limit)  postData.limit = 50 
                 
-        function page (n) {
-            return Math.floor (n / postData.limit)
-        }
-
         var data = {length: 0}
+        var in_progress = {}
         var sortcol = null
         var sortdir = 1
         
@@ -505,108 +502,95 @@
 
         function init () {}
 
-        function isDataLoaded (from, to) {
-            for (var i = from; i <= to; i ++) if (!data [i]) return false
-            return true;
-        }
-        
-        function isPageLoaded (p) {
-            let n = p * postData.limit
-            return isDataLoaded (n, n)
-        }
-
         function clear () {
             for (k in data) if (k != 'getItemMetadata') delete data [k]
             data.length = 0
         }
         
         async function each (cb) {
-
-			let pd = clone (postData); pd.offset = 0
-
-			let i = 0
-
-			let len = data.length; while (pd.offset < len) {
-
-				let d = await response (tia, pd); for (let k of ['portion', 'cnt']) delete d [k]
+			
+			for (let i = 0, from = 0, len = data.length; from < len; from += postData.limit) {
+			
+				let {all, cnt} = await select_all_cnt (from)
 				
-                let l; for (let k in d) l = d [k]
-
-				for (let r of l) cb.call (r, i ++)
-
-				pd.offset += pd.limit
-
+				for (let one of all) cb.call (one, i ++)
+				
 			}
-
+			
         }        
+        
+        function to_all_cnt (data) {
+        
+        	let all_cnt = {}
+        	
+        	for (let k in data) 
+        		if (k != 'portion') 
+        			all_cnt 
+        				[k == 'cnt' ? 'cnt' : 'all'] 
+        					= data [k]
+        	
+			return all_cnt
+        
+        }
 
+        async function select_all_cnt (from) {
+
+			let pd = clone (postData)
+			
+			pd.offset = from
+			
+			return to_all_cnt (await response (tia, pd))
+                
+        }
+        
+        async function ensurePage (p) {
+
+			if (in_progress [p]) return
+
+			let portion = postData.limit
+
+			let from = p * portion
+			
+			if (data [from]) return
+			
+			let e = {from, to: from + portion - 1}
+			
+            onDataLoading.notify (e)
+            
+            	in_progress [p] = 1
+            	
+            		let {all, cnt} = await select_all_cnt (from)
+
+					let len = all.length
+
+					data.length = parseInt (cnt) || len
+
+					for (var i = 0; i < len; i ++) data [from + i] = all [i]
+				
+				delete in_progress [p]
+
+            onDataLoaded.notify (e)
+        
+        }
+        
         function ensureData (from, to) {
 
             if (!(from >= 0)) from = 0
 
-            let len = data.length
-            if (to >= len) to = len - 1
-
-            let fromPage = page (from)
-            let toPage   = page (to)
+            let len = data.length; if (len > 0 && to >= len) to = len - 1
             
-            while (fromPage < toPage && isPageLoaded (fromPage)) fromPage ++
-            while (fromPage < toPage && isPageLoaded (toPage))   toPage --
+            let [p_from, p_to] = [from, to].map (n => Math.floor (n / postData.limit))
 
-            if (fromPage == toPage && isPageLoaded (fromPage)) return
-
-            from = postData.offset = fromPage * postData.limit
-            to   = (toPage + 1) * postData.limit - 1
-
-            setTimeout (function () {
-
-                for (var i = fromPage; i <= toPage; i ++) data [i * postData.limit] = null
-
-                onDataLoading.notify ({from, to});
-
-                $.ajax (dynamicURL (tia), {
-                    dataType:    'json',
-                    method:      'POST',
-                    processData: false,
-                    contentType: 'application/json',
-                    timeout:     10000,
-                    data:        JSON.stringify (postData),
-                    headers:     {}
-                })
-
-                .done (function (d) {
-
-                    let c = d.content
-                    
-                    delete c.portion
-
-                    let cnt = c.cnt; delete c.cnt
-                    
-                    let l; for (let k in c) l = c [k]; let len = l.length
-
-                    data.length = parseInt (cnt) || len
-
-                    for (var i = 0; i < len; i ++) {
-                        var r = l [i]
-                        r.index = from + i
-                        data [from + i] = r
-                    }
-
-                    onDataLoaded.notify ({from, to})
-
-                })
-
-                .fail (function (jqXHR, e) {
-                    $_DO.apologize ({jqXHR: jqXHR, error: e}, fail)
-                })  
-
-            }, 0)
-
+            for (let p = p_from; p <= p_to; p ++) ensurePage (p)
+            		
         }
 
         function reloadData (from, to) {
+        
             for (var i = from; i <= to; i ++) delete data [i]
+            
             ensureData (from, to);
+            
         }
 
         function setSort (field, dir) {
@@ -645,7 +629,6 @@
           postData,
 
           clear,
-          isDataLoaded,
           ensureData,
           reloadData,
           setSort,
