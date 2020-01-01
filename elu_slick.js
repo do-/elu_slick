@@ -96,6 +96,8 @@
     	for (let k of ['width', 'height']) if (!(k in o)) o [k] = this.attr (k)
     	    	
         let d = this.dialog (o).on ('dialogclose', (e) => {$(this).closest('.ui-dialog').remove (); blockEvent (e)})
+
+    	$('.ui-dialog-titlebar button', d.parent ()).attr ({tabindex: -1})
     
     	return d
 
