@@ -276,9 +276,11 @@
         if (o.showHeaderRow) {
         
             let f = o.onHeaderRowCellRendered || ((e, a) => {            
-                let filter = a.column.filter            
-                if (filter) return grid.setColFilter (a, filter)
-                $(a.node).text ('\xa0')            
+                let column = a.column
+                let filter = column.filter                
+                if (!filter) return $(a.node).text ('\xa0')
+                if (!('title' in filter)) filter.title = column.name
+                grid.setColFilter (a, filter)
             })
             
             o.onHeaderRowCellRendered = (e, a) => {
