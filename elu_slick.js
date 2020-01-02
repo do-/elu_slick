@@ -1131,3 +1131,140 @@ $_DRAW._grid_filter_checkboxes_popup = async function (o) {
   	}
 
 }
+
+////////////////////////////////////////////////////////////////////////////////
+
+$_GET._grid_filter_dates = async function (data) {
+
+	let a = data.a
+	let grid = a.grid
+	
+	let o = data.filter || {}
+	let [yyyy, mm, dd] = new Date ().toJSON ().slice (0, 10).split ('-')
+	for (let k of ['dt_from', 'dt_to']) {
+		if (!(k in o)) continue
+		let v = o [k]
+		if (v instanceof Date) v = v.toJSON ().slice (0, 10)
+		v = v.replace ('YYYY', yyyy).replace ('MM', mm).replace ('DD', dd)
+		o [k] = v
+	}
+	
+	data.get_dates = function () {
+	
+		let loader = grid.loader; if (!loader || !loader.postData || !loader.postData.search) return null
+
+		for (let search of loader.postData.search) 
+			if (search.field == a.column.id) 
+				return search.value
+
+	}                 
+
+	data.set_dates = function (dt_from, dt_to) {
+
+		$(a.node).text (data.label (dt_from, dt_to))
+
+		grid.setFieldFilter ({
+			field:    a.column.id, 
+			type:     'date',
+			operator: 'between',
+			value:    [dt_from, dt_to],
+		})
+
+	}
+
+	return data
+
+}
+
+////////////////////////////////////////////////////////////////////////////////
+
+$_DRAW._grid_filter_dates = async function (data) {
+
+	let o = data.filter
+	let a = data.a
+	let grid = a.grid
+	
+	let name = a.column.id
+
+	let $anode = $(a.node)
+
+	data.label = function (dt_from, dt_to) {
+		if (!dt_from && !dt_to) return '[не важно]'
+		if (dt_from == dt_to) return dt_dmy (dt_from)
+		let s = ''
+		if (dt_from) s += ' с '  + dt_dmy (dt_from)
+		if (dt_to)   s += ' по ' + dt_dmy (dt_to)
+		return s.trim ()
+	}                 
+	
+	let [dt_from, dt_to] = data.get_dates () || []
+	
+	$anode
+		.text  (data.label (dt_from, dt_to))
+		.click (() => show_block ('_grid_filter_dates_popup', data))
+		.data  ('drop', () => {$anode.text (data.label (null, null))})
+
+}
+
+////////////////////////////////////////////////////////////////////////////////
+
+$_GET._grid_filter_dates_popup = async function (data) {
+
+	delete data._can
+
+	let [dt_from, dt_to] = data.get_dates () || []
+	
+	if (!data.dt_from) data.dt_from = data.filter.dt_from || dt_from
+	if (!data.dt_to)   data.dt_to   = data.filter.dt_to   || dt_to
+
+	return data
+
+}
+
+////////////////////////////////////////////////////////////////////////////////
+
+$_DO.update__grid_filter_dates_popup = async function (e) {
+
+	let $this = get_popup ()
+	
+	let {dt_from, dt_to} = $this.valid_data ()
+
+	$this.data ('data').set_dates (dt_from, dt_to)
+
+	close_popup ()
+
+}
+
+////////////////////////////////////////////////////////////////////////////////
+
+$_DRAW._grid_filter_dates_popup = async function (o) {
+
+	let filter = o.filter
+
+    let $view = fill ($(`
+    
+		<span class="drw popup-form">
+			
+			<table width=100%>
+				<tr><td>
+					с  <input name=dt_from type=date>
+					по <input name=dt_to   type=date>				
+			</table>
+
+			<button name=update>Установить</button>
+
+		</span>
+
+	`), o)
+
+	$('*', $view).attr ({'data-block-name': '_grid_filter_dates_popup'})
+
+	$view.data ('data', o)
+	$view.setup_buttons ()
+
+	$view.draw_popup ({
+		title: filter.title,
+		width: 310
+	})
+
+}
