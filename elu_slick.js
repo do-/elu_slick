@@ -1058,11 +1058,6 @@ $_DRAW._grid_filter_checkboxes_popup = async function (o) {
 					width: 100%;
 				}
 
-				#grid_options input[type=checkbox] {
-					height: 13px;
-					width: 13px;
-				}
-
 			</style>
 
 			<div id="grid_options" class="drw table" />
