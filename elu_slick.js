@@ -371,6 +371,43 @@
             grid.refresh ()
         }
         
+        grid.moveSelectedDataFrom = (grid_from, o = {}) => {
+
+			let src = clone (grid_from.getData ())
+			let dst = clone (grid.getData ())
+			let ids = clone (grid_from.getSelectedRows ()).reverse ()
+
+			for (let id of ids) dst.push (src.splice (id, 1) [0])
+
+			grid_from.setData (src)
+			grid_from.setSelectedRows ([])
+			grid_from.render ()
+
+			if (!o.sort) for (let column of grid.getColumns ()) {
+				if (column.id == "_checkbox_selector") continue
+				let field = column.field
+				if (!field) continue
+				o.sort = field
+				break
+			}
+			
+			if (typeof o.sort != 'function') {
+
+				let k = o.sort, f = r => r [k]
+				
+				o.sort = (a, b) => {
+					let fa = f (a), fb = f (b)
+					return fa > fb ? 1 : fa < fb ? -1 : 0
+				}
+
+			}
+
+			grid.setData (dst.sort (o.sort))
+			grid.setSelectedRows ([])
+			grid.render ()
+
+        }
+        
         grid.findDataItem = (r) => {
         
         	let data = grid.getData ()
