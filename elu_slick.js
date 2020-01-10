@@ -439,33 +439,35 @@
 
         }        
         
+        grid.setColFilter = (a, filter) => show_block ('_grid_filter_' + filter.type, {a, filter})
+
+        grid.toSearch = function ($input) {
+        
+            function op (tag) {switch (tag) {
+                case 'INPUT': return 'contains'
+                default: return 'is'
+            }}
+            
+            function val () {
+                let v = $input.val ()
+                if (v === '') return null
+                return v
+            }
+        
+            return {
+                field: $input.attr ('data-field') || $input.attr ('name'), 
+                value: val (),
+                operator: $input.attr ('data-op') || op ($input.get (0).tagName),
+            }
+            
+        }                
+        
         if (loader) {
         
         	grid.each = loader.each
         
             grid.loader = loader
-            
-            grid.toSearch = function ($input) {
-            
-                function op (tag) {switch (tag) {
-                    case 'INPUT': return 'contains'
-                    default: return 'is'
-                }}
-                
-                function val () {
-                    let v = $input.val ()
-                    if (v === '') return null
-                    return v
-                }
-            
-                return {
-                    field: $input.attr ('data-field') || $input.attr ('name'), 
-                    value: val (),
-                    operator: $input.attr ('data-op') || op ($input.get (0).tagName),
-                }
-                
-            }                
-            
+                        
             for (let i of o.searchInputs) {
                 let $i = $(i)
                 let tag = $i.get (0).tagName
@@ -489,10 +491,6 @@
                 grid.reload ()
             }
             
-            grid.setColFilter = (a, filter) => {            
-            	show_block ('_grid_filter_' + filter.type, {a, filter})            	            
-            }
-
             loader.onDataLoaded.subscribe ((e, args) => {
                 for (var i = args.from; i <= args.to; i ++) grid.invalidateRow (i)
                 grid.updateRowCount ()
@@ -520,15 +518,51 @@
 
         }
         else {
+        	
+        	let nnu = s => (s || '').toUpperCase ()
+
+        	grid.search = {
+        	
+        		terms: [], 
+        		
+        		test: {
+        			begins:   (v, sv) => nnu (v).indexOf (nnu (sv)) == 0,
+        			contains: (v, sv) => nnu (v).indexOf (nnu (sv)) > -1,
+        			in:       (v, sv) => (sv || []).includes (v),
+        		}
+
+        	}
+
+        	grid.filter = r => {
+        		for (let term of grid.search.terms) if (!grid.search.test [term.operator] (r [term.field], term.value)) return false
+        		return true
+        	}
+
+        	grid.init_data = clone (o.data)
+
+        	grid.unsetFieldFilter = (field) => {
+        		grid.search.terms = grid.search.terms.filter (term => term.field != field)
+        	}
+
+        	grid.setFieldFilter = (term) => {
+        		grid.unsetFieldFilter (term.field)
+        		grid.search.terms.push (term)
+        		grid.reload ()
+        	}
+
+			grid.reload = () => {
+				grid.setData (grid.init_data.filter (grid.filter))
+				grid.invalidate ()
+			}
 
 			grid.each = async function (cb) {
-			
+
 				let data = grid.data
 
 				for (let i = 0; i < data.length; i ++) cb.call (data [i], i)
 
-			}        
-        
+			}
+
         }
         
 		grid.saveAsXLS = async function (fn, cb) {
