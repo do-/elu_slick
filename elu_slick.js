@@ -370,18 +370,13 @@
             grid.setData (loader.data, true)
             grid.refresh ()
         }
-        
-        grid.moveSelectedDataFrom = (grid_from, o = {}) => {
+                
+        grid.moveDataFrom = (grid_from, o = {}) => {
 
 			let src = clone (grid_from.getData ())
 			let dst = clone (grid.getData ())
-			let ids = clone (grid_from.getSelectedRows ()).reverse ()
 
-			for (let id of ids) dst.push (src.splice (id, 1) [0])
-
-			grid_from.setData (src)
-			grid_from.setSelectedRows ([])
-			grid_from.render ()
+			for (let row of clone (o.rows || []).sort ((a, b) => b - a)) dst.push (src.splice (row, 1) [0])
 
 			if (!o.sort) for (let column of grid.getColumns ()) {
 				if (column.id == "_checkbox_selector") continue
@@ -402,10 +397,22 @@
 
 			}
 
+			grid_from.setData (src)
 			grid.setData (dst.sort (o.sort))
-			grid.setSelectedRows ([])
-			grid.render ()
+			
+			for (let g of [grid_from, grid]) {
+				g.setSelectedRows ([])
+				g.render ()
+			}
 
+        }
+        
+        grid.moveDataTo = (grid_to, o = {}) => {
+        	grid_to.moveDataFrom (grid, o)
+        }
+        
+        grid.moveSelectedDataTo = (grid_to, o = {}) => {
+        	grid_to.moveDataFrom (grid, Object.assign (o, {rows: grid.getSelectedRows ()}))
         }
         
         grid.findDataItem = (r) => {
