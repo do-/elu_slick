@@ -364,7 +364,17 @@
         }
         
         grid.refresh = () => grid.onViewportChanged.notify ()
-        
+
+		grid.draw_popup = async function (name, data, o = {}) {
+
+			let $view = await draw_popup (name, data, o)
+
+			$view.data ('grid', grid)
+
+			return $view
+
+		}
+
         grid.reload = () => {
             loader.clear ()
             grid.setData (loader.data, true)
@@ -979,11 +989,15 @@ function get_popup () {
 function close_popup () {
 
     let $this = get_popup ()
+    
+    let grid = $this.data ('grid')
 
     $this.dialog ('close')
 
     $this.remove ()
     
+    if (grid) grid.reload ()
+
 }
 
 ////////////////////////////////////////////////////////////////////////////////
