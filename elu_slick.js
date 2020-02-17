@@ -1019,6 +1019,7 @@ $_DRAW._grid_filter_text = async function (data) {
     
     $ns.attr ({
         'data-field': a.column.id,
+        'data-op': o.op || 'contains',
         placeholder: o.title || a.column.name,
     })
     
