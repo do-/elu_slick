@@ -732,6 +732,7 @@
         function ensureData (from, to) {
 
             if (!(from >= 0)) from = 0
+            if (!from && !to) {from = 0; to = 1}
 
             let len = data.length; if (len > 0 && to >= len) to = len - 1
             
