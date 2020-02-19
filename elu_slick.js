@@ -265,8 +265,15 @@
 		
 		}) 
 
-        let grid = new Slick.Grid (this, o.data, o.columns, o)
+        if (o.max_height) o.autoHeight = true
+
+    	let grid = new Slick.Grid (this, o.data, o.columns, o)
         
+        if (o.max_height) {
+            $('.slick-viewport.slick-viewport-top.slick-viewport-left', $(this)).css ('max-height', o.max_height)
+            $('.slick-pane.slick-pane-top.slick-pane-left', $(this)).css ('max-height', o.max_height)
+        }
+
         this.data ('grid', grid)
         
 		for (let plugin of plugins) grid.registerPlugin (plugin)
