@@ -383,6 +383,7 @@
 		}
 
         grid.reload = () => {
+            $_SESSION.set ('reload_' + grid.getContainerNode().id, true)
             loader.clear ()
             grid.setData (loader.data, true)
             grid.refresh ()
@@ -521,6 +522,11 @@
             
             grid.onViewportChanged.subscribe (function (e, args) {
                 var vp = grid.getViewport ()
+
+		let is_reload = $_SESSION.delete ('reload_' + grid.getContainerNode().id)
+
+		if (is_reload && grid.getOptions().max_height && isNaN(vp.bottom)) vp.bottom = 1
+
                 loader.ensureData (vp.top, vp.bottom)
             })
 
@@ -732,7 +738,6 @@
         function ensureData (from, to) {
 
             if (!(from >= 0)) from = 0
-            if (!from && !to) {from = 0; to = 1}
 
             let len = data.length; if (len > 0 && to >= len) to = len - 1
             
