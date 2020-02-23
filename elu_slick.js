@@ -196,6 +196,7 @@
     $.fn.draw_table = function (o) {    
                     
         o = Object.assign ({
+        	enableTextSelectionOnCells: true,
             enableCellNavigation: true,
             forceFitColumns: true, 
 			autoEdit: false,
