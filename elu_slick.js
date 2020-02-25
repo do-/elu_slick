@@ -258,7 +258,7 @@
 			
 				if (!c.id) c.id = c.field
 
-				if (c.voc) c.formatter = (r, _, v) => c.voc [v]
+				if (c.voc && !c.formatter) c.formatter = (r, _, v) => Array.isArray (v)? v.map (vv => c.voc [vv]).join(',') : c.voc [v]
 				
 				return c
             
