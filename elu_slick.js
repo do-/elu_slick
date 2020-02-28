@@ -272,7 +272,7 @@
         
         if (o.max_height) {
             $('.slick-viewport.slick-viewport-top.slick-viewport-left', $(this)).css ('max-height', o.max_height)
-            $('.slick-pane.slick-pane-top.slick-pane-left', $(this)).css ('max-height', o.max_height)
+            $('.slick-pane.slick-pane-top.slick-pane-left', $(this)).css ('max-height', o.max_height + 50)
         }
 
         this.data ('grid', grid)
