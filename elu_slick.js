@@ -493,14 +493,33 @@
                 if (tag == 'BUTTON') continue
                 loader.setSearch (grid.toSearch ($i))
                 switch (tag) {
+                
                     case 'INPUT':
+                    
                         $i.keyup ((e) => {if (e.which == 13) grid.setFieldFilter (grid.toSearch ($i))})
+                        
                         break
+                        
                     case 'SELECT':
-                        $i.select2 ({
-                            dropdownAutoWidth : true,
-                        }).on ('change', function () {grid.setFieldFilter (grid.toSearch ($i))})
+                    
+                    	if ($i.select2) {
+
+							$i.select2 ({
+								dropdownAutoWidth : true,
+							}).on ('change', function () {grid.setFieldFilter (grid.toSearch ($i))})
+
+                    	}
+                    	else {
+
+							$i.selectmenu ({
+								width: true,
+								change: () => {grid.setFieldFilter (grid.toSearch ($i))}
+							})                        
+
+                    	}
+
                         break
+
                 }
             }
 
