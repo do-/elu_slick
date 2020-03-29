@@ -227,6 +227,28 @@
 			o.url = {type, part, id: null}
 			if (src.length > 1) o.postData = src [1]
 		}
+		
+		if (o.url) {
+		
+			let search = $_SESSION.delete ('_grid_serach'); 
+
+			if (search && search.length) {
+			
+				if (!o.postData) o.postData = {}
+			
+				let ids = {}; for (let i of search) ids [i.field] = 1
+				
+				o.postData.search = [
+				
+					...(o.postData.search || []).filter (i => !ids [i.field]), 
+					
+					...search
+				
+				]
+
+			}
+		
+		}
 
         let loader = !o.url ? null : new Slick.Data.RemoteModel (o.url, o.postData)
 
