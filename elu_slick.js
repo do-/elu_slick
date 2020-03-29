@@ -480,7 +480,21 @@
 
         }        
         
-        grid.setColFilter = (a, filter) => show_block ('_grid_filter_' + filter.type, {a, filter})
+        grid.setColFilter = (a, filter) => {
+        
+        	let data = {a, filter}
+        
+        	let {loader} = a.grid; if (loader) {
+        	
+        		let [term] = loader.postData.search.filter (i => i.field == a.column.id)
+        		
+        		if (term) data.value = term.value
+        	
+        	}
+
+        	show_block ('_grid_filter_' + filter.type, data)
+
+        }
 
         grid.toSearch = function ($input) {
         
@@ -1083,7 +1097,7 @@ $_DRAW._grid_filter_text = async function (data) {
 	let a = data.a
 	let o = data.filter || {}
 	
-    let $ns = $('<input class=ui-widget>')
+    let $ns = $('<input class=ui-widget>').val (data.value)
     
     $ns.attr ({
         'data-field': a.column.id,
