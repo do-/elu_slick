@@ -508,12 +508,26 @@
         	grid.each = loader.each
         
             grid.loader = loader
-                        
+            
+            let search = loader.postData.search || []
+            
             for (let i of o.searchInputs) {
-                let $i = $(i)
-                let tag = $i.get (0).tagName
-                if (tag == 'BUTTON') continue
-                loader.setSearch (grid.toSearch ($i))
+            
+                let $i = $(i), tag = $i.get (0).tagName; if (tag == 'BUTTON') continue
+                
+                let name = $i.attr ('name'), [term] = search.filter (i => i.field == name)
+                
+                if (term) {
+                
+                	$i.val (term.value)
+                
+                }
+                else {
+                
+	                loader.setSearch (grid.toSearch ($i))
+                
+                }
+                
                 switch (tag) {
                 
                     case 'INPUT':
