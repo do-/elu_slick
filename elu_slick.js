@@ -769,6 +769,7 @@
 			let pd = clone (postData)
 			
 			pd.offset = from
+			pd.search = (pd.search || []).filter (i => i.operator)
 			
 			return to_all_cnt (await response (tia, pd))
                 
