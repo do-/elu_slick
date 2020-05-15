@@ -500,29 +500,40 @@
         }
 
         grid.toSearch = function ($input) {
-        
-            function op (tag) {switch (tag) {
-                case 'INPUT': return 'contains'
-                default: return 'is'
-            }}
-            
+
+            function op () {
+
+                let tag  = $input.get (0).tagName
+                let type = $input.attr ('filter-type') || $input.attr ('type')
+
+                if (tag == 'INPUT' && type != 'date') return 'contains'
+
+                return 'is'
+            }
+
             function val () {
                 let v = $input.val ()
                 if (v === '') return null
+
+                let type = $input.attr ('filter-type') || $input.attr ('type')
+
+                if (type == 'date')
+                    v = v.split(".").reverse().join("-")
+
                 return v
             }
-        
+
             return {
-                field: $input.attr ('data-field') || $input.attr ('name'), 
+                field: $input.attr ('data-field') || $input.attr ('name'),
                 value: val (),
-                operator: $input.attr ('data-op') || op ($input.get (0).tagName),
+                operator: $input.attr ('data-op') || op (),
             }
-            
-        }                
+
+        }
         
         if (loader) {
         
-        	grid.each = loader.each
+            grid.each = loader.each
         
             grid.loader = loader
             
@@ -551,6 +562,9 @@
                     
                         $i.keyup ((e) => {if (e.which == 13) grid.setFieldFilter (grid.toSearch ($i))})
                         
+                        if ($i.attr ('type') == 'date')
+                            $i.change ((e) => {grid.setFieldFilter (grid.toSearch ($i))})
+
                         break
                         
                     case 'SELECT':
