@@ -1056,9 +1056,21 @@ function add_vocabularies (data, o) {
 
     for (var name in o) {
 
-        var raw = data [name]; if (!raw) continue
+        let raw = data [name]; if (!raw) continue
 
-        var idx = {items: raw.filter (function (r) {var f = r.fake; return !f || parseInt (f) == 0})}; $.each (raw, function () {idx [this.id] = this.text = this.label})
+        let idx = {}, items = []
+
+        for (let r of raw) {
+
+        	idx [r.id] = r.text = r.label
+
+        	if (r.is_deleted == 1) continue
+
+        	items.push (r)
+
+        }
+
+        idx.items = items
 
         data [name] = idx
 
