@@ -216,6 +216,20 @@
 			$row.remove ()
         }
         
+        let max_col_rows = 1; for (let column of o.columns) {
+
+        	if (!column.rows) column.rows = 1
+
+        	if (column.rows == 1) continue
+
+        	column.cssClass = ((column.cssClass || '') + ' wrap').trim ()
+
+        	if (max_col_rows < column.rows) max_col_rows = column.rows
+
+        }
+
+        o.rowHeight *= max_col_rows
+
         if (!o.headerRowHeight) {
 			let $row = $('<div class=slick-headerrow style="position:fixed;z-index:1000" />').prependTo (this)
 			let h = $row.height (); if (h > 0) o.headerRowHeight = h
