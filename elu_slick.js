@@ -308,7 +308,36 @@
         if (o.max_height) o.autoHeight = true
 
     	let grid = new Slick.Grid (this, o.data, o.columns, o)
-        
+
+		grid.onColumnsChanged = new Slick.Event ()
+
+		grid.notifyColumnsChanged = () => {
+
+			let a = {
+			
+				columns: grid.getColumns ().map (c => ({
+					id: c.id, 
+					width: c.width
+				}))
+			
+			}
+			
+			let {loader} = grid; if (loader) {
+
+				let {postData} = loader; if (postData) for (let k of ['search', 'sort']) {
+
+					let v = postData [k]; if (v) a [k] = v
+
+				}
+
+			}
+
+			grid.onColumnsChanged.notify (a, new Slick.EventData (), grid)
+
+		}
+
+		for (let e of ['onColumnsResized', 'onColumnsReordered']) grid [e].subscribe (grid.notifyColumnsChanged)
+
         if (o.max_height) {
             $('.slick-viewport.slick-viewport-top.slick-viewport-left', $(this)).css ('max-height', o.max_height)
             $('.slick-pane.slick-pane-top.slick-pane-left', $(this)).css ('max-height', o.max_height + 50)
@@ -606,6 +635,7 @@
 
             grid.setFieldFilter = (s) => {
                 grid.loader.setSearch (s)
+                grid.notifyColumnsChanged ()
                 grid.reload ()
             }
             
@@ -620,13 +650,10 @@
                 this.unblock ()
             })        
             
-            grid.onViewportChanged.subscribe (function (e, args) {
+            grid.onViewportChanged.subscribe (function (e, args) {            
                 var vp = grid.getViewport ()
-
-		let is_reload = $_SESSION.delete ('reload_' + grid.getContainerNode().id)
-
-		if (is_reload && grid.getOptions().max_height && isNaN(vp.bottom)) vp.bottom = 1
-
+				let is_reload = $_SESSION.delete ('reload_' + grid.getContainerNode().id)
+				if (is_reload && grid.getOptions().max_height && isNaN(vp.bottom)) vp.bottom = 1
                 loader.ensureData (vp.top, vp.bottom)
             })
 
@@ -665,12 +692,6 @@
 
         	grid.unsetFieldFilter = (field) => {
         		grid.search.terms = grid.search.terms.filter (term => term.field != field)
-        	}
-
-        	grid.setFieldFilter = (term) => {
-        		grid.unsetFieldFilter (term.field)
-        		grid.search.terms.push (term)
-        		grid.reload ()
         	}
 
 			grid.reload = () => {
