@@ -324,9 +324,11 @@
 			
 			let {loader} = grid; if (loader) {
 
-				let {postData} = loader; if (postData) for (let k of ['search', 'sort']) {
+				let {postData} = loader; if (postData) for (let k in postData) switch (k) {
 
-					let v = postData [k]; if (v) a [k] = v
+					case 'search':
+					case 'sort':
+						a [k] = postData [k]
 
 				}
 
@@ -659,6 +661,7 @@
 
             grid.onSort.subscribe (function (e, args) {
                 loader.setSort (args.sortCol.field, args.sortAsc ? 1 : -1)
+                grid.notifyColumnsChanged ()
                 grid.reload ()
             })
             
