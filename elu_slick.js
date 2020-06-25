@@ -245,13 +245,25 @@
 			if (src.length > 1) o.postData = src [1]
 		}
 		
+		if (!o.sort) {
+		
+			let sort = $_SESSION.delete ('_grid_sort'); if (sort) o.sort = sort
+
+		}
+
+		if (!o.search) {
+		
+			let search = $_SESSION.delete ('_grid_serach') || $_SESSION.delete ('_grid_search'); if (search) o.search = search
+
+		}
+
 		if (o.url) {
 		
-			let search = $_SESSION.delete ('_grid_serach'); 
+			if (!o.postData) o.postData = {}
 
-			if (search && search.length) {
+			let {search, sort} = o; 
 			
-				if (!o.postData) o.postData = {}
+			if (search && search.length) {			
 			
 				let ids = {}; for (let i of search) ids [i.field] = 1
 				
@@ -264,7 +276,9 @@
 				]
 
 			}
-		
+
+			if (sort && sort.length) o.postData.sort = sort
+
 		}
 
         let loader = !o.url ? null : new Slick.Data.RemoteModel (o.url, o.postData)
@@ -308,6 +322,11 @@
         if (o.max_height) o.autoHeight = true
 
     	let grid = new Slick.Grid (this, o.data, o.columns, o)
+    	
+    	let {sort} = o; if (sort) grid.setSortColumns (sort.map (i => ({
+    		columnId : i.field, 
+    		sortAsc  : i.direction != 'desc'
+    	})))
 
 		grid.onColumnsChanged = new Slick.Event ()
 
