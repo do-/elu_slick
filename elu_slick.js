@@ -336,15 +336,67 @@
 
 		grid.notifyColumnsChanged = () => {
 
-			let a = {
-			
-				columns: grid.getColumns ().map (c => ({
-					id: c.id, 
-					width: c.width
-				}))
-			
+			let {all_columns} = grid.getOptions (), idx = {}
+
+			for (let c of all_columns) {
+
+				c.hidden = 1
+
+				idx [c.id] = c
+
+			}
+
+			for (let c of grid.getColumns ()) {
+
+				let ac = idx [c.id]
+
+				ac.hidden = 0
+
+				ac.width = c.width
+
 			}
 			
+			let last = '', before = {'' : []}
+
+			for (let c of all_columns) {
+			
+				if (c.hidden) {
+				
+					if (!before [last]) before [last] = []
+					
+					before [last].push (c.id)
+				
+				}
+				else {
+				
+					last = c.id
+				
+				}
+
+			}
+			
+			let columns = before [''].map (id => idx [id])
+			
+			for (let c of grid.getColumns ()) {
+
+				let b = before [c.id]
+				
+				if (b) for (let id of b) columns.push (idx [id])
+				
+				columns.push (c)
+
+			}
+
+			let a = {
+
+				columns: columns.map (c => ({
+					id: c.id, 
+					width: c.width,
+					hidden: c.hidden,
+				}))
+
+			}
+
 			let {loader} = grid; if (loader) {
 
 				let {postData} = loader; if (postData) for (let k in postData) switch (k) {
@@ -466,6 +518,18 @@
         
         grid.refresh = () => grid.onViewportChanged.notify ()
 
+        grid.triggerColumn = (id, visible) => {
+        
+        	let {all_columns} = grid.getOptions ()
+        
+        	for (let c of all_columns) if (c.id == id) c.hidden = visible ? 0 : 1
+
+			grid.setColumns (all_columns.filter (c => !c.hidden))
+
+			grid.notifyColumnsChanged ()
+
+        }
+        
 		grid.draw_popup = async function (name, data, o = {}) {
 
 			let $view = await draw_popup (name, data, o)
