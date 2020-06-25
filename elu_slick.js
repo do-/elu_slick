@@ -320,6 +320,10 @@
 		}) 
 
         if (o.max_height) o.autoHeight = true
+        
+        o.all_columns = o.columns
+        
+        o.columns = o.all_columns.filter (i => !i.hidden)
 
     	let grid = new Slick.Grid (this, o.data, o.columns, o)
     	
