@@ -106,7 +106,8 @@
 
     }
 
-    $.fn.draw_form = function (data) {
+    $.fn.draw_form = function (data, options = {}) {
+      const { is_confirm_unload = 0 } = options;
 
     	let _fields = data._fields; if (_fields) for (let _field of Object.values (_fields)) {
 
@@ -146,9 +147,25 @@
 
         }
 
+        let confirm_unload = (on = true) => {
+
+          if (on) {
+            $(window).bind("beforeunload", function(e) {
+              e.preventDefault();
+              e.returnValue = '';
+              return '';
+            });
+          } else {
+            $(window).off('beforeunload');
+          }
+
+        }
+
         let read_only = {
         
             off: () => {
+
+                if (is_confirm_unload) confirm_unload()
 
                 $('button', $view).each (function () {
                     if (is_visible (this.name, 0)) $(this).show (); else $(this).hide ()
@@ -163,6 +180,8 @@
             },
             
             on: () => {
+
+                if (is_confirm_unload) confirm_unload(false)
 
                 $('button', $view).each (function () {
                     if (is_visible (this.name, 1)) $(this).show (); else $(this).hide ()
@@ -1203,9 +1222,9 @@ function add_vocabularies (data, o) {
 
 }
 
-async function draw_form (name, data) {
+async function draw_form (name, data, options) {
 
-	return (await use.jq (name)).draw_form (data)
+	return (await use.jq (name)).draw_form (data, options)
 	
 }
 
