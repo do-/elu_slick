@@ -147,16 +147,29 @@
 
         }
 
-        let confirm_unload = (on = true) => {
+        let confirm_unload = {
 
-          if (on) {
+          off: () => {
+
+            $(window).off('beforeunload')
+
+          },
+
+          on: () => {
+
+            let inputsChanged = false
+            $('input, select, textarea', $view).on('change', () => {
+              inputsChanged = true
+            })
+
             $(window).bind("beforeunload", function(e) {
-              e.preventDefault();
-              e.returnValue = '';
-              return '';
-            });
-          } else {
-            $(window).off('beforeunload');
+              if (inputsChanged) {
+                e.preventDefault()
+                e.returnValue = ''
+                return ''
+              }
+            })
+
           }
 
         }
@@ -165,7 +178,7 @@
         
             off: () => {
 
-                if (is_confirm_unload) confirm_unload()
+                if (is_confirm_unload) confirm_unload.on()
 
                 $('button', $view).each (function () {
                     if (is_visible (this.name, 0)) $(this).show (); else $(this).hide ()
@@ -181,7 +194,7 @@
             
             on: () => {
 
-                if (is_confirm_unload) confirm_unload(false)
+                if (is_confirm_unload) confirm_unload.off()
 
                 $('button', $view).each (function () {
                     if (is_visible (this.name, 1)) $(this).show (); else $(this).hide ()
