@@ -150,13 +150,26 @@
         let confirm_unload = (on = true) => {
 
           if (on) {
+            let inputsChanged = false
+            $('input', $view).on('change', () => {
+              inputsChanged = true
+            })
+            $('select', $view).on('change', () => {
+              inputsChanged = true
+            })
+            $('textarea', $view).on('change', () => {
+              inputsChanged = true
+            })
+
             $(window).bind("beforeunload", function(e) {
-              e.preventDefault();
-              e.returnValue = '';
-              return '';
-            });
+              if (inputsChanged) {
+                e.preventDefault()
+                e.returnValue = ''
+                return ''
+              }
+            })
           } else {
-            $(window).off('beforeunload');
+            $(window).off('beforeunload')
           }
 
         }
