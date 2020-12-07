@@ -151,13 +151,7 @@
 
           if (on) {
             let inputsChanged = false
-            $('input', $view).on('change', () => {
-              inputsChanged = true
-            })
-            $('select', $view).on('change', () => {
-              inputsChanged = true
-            })
-            $('textarea', $view).on('change', () => {
+            $('input, select, textarea', $view).on('change', () => {
               inputsChanged = true
             })
 
