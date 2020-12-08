@@ -151,6 +151,7 @@
 
           off: () => {
 
+            $_SESSION.delete ('is_confirm_unload')
             $(window).off('beforeunload')
 
           },
@@ -159,7 +160,10 @@
 
             let inputsChanged = false
             $('input, select, textarea', $view).on('change', () => {
-              inputsChanged = true
+              if (!inputsChanged) {
+                $_SESSION.set ('is_confirm_unload', 1)
+                inputsChanged = true
+              }
             })
 
             $(window).bind("beforeunload", function(e) {
@@ -1208,6 +1212,13 @@
   $.extend (true, window, {Slick: {Editors: {Input, Select}}})  
 
 })(jQuery)
+
+function reload_page () {
+
+  if ($_SESSION.delete ('is_confirm_unload')) $(window).off('beforeunload')
+  location.reload ()
+
+}
 
 function add_vocabularies (data, o) {
 
