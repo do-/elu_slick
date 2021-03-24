@@ -324,7 +324,9 @@
         if (!o.data.getItemMetadata) o.data.getItemMetadata = o.getItemMetadata || function (row) {
             let r = o.data [row]
             if (r == null) return 
-            if (r.is_deleted == 1) return {cssClasses: 'deleted'}
+            let classes = r.classes || ''
+            if (r.is_deleted == 1) classes = classes + ' deleted'
+            if (classes) return {cssClasses: classes}
         }
 
 		let plugins = []
