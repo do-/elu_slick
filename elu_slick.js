@@ -513,7 +513,7 @@
         
         if (o.onRecordDblClick) {
         
-        	o.onDblClick = (e, a) => o.onRecordDblClick (a.grid.getDataItem (a.row))
+        	o.onDblClick = (e, a) => o.onRecordDblClick (a.grid.getDataItem (a.row), a.grid.getColumns()[a.cell])
         
         }
         
