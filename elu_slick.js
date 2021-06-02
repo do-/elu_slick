@@ -863,7 +863,7 @@
 					
 						value = formatter (row, cell, value, columnDef, this)
 
-						if (typeof value === 'object' && 'text' in value) value = value.text
+						if (value && typeof value === 'object' && 'text' in value) value = value.text
 						
 					}
 
