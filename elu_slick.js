@@ -841,7 +841,7 @@
 		
 			let cols = grid.getColumns ()
 
-			let html = '<html><head><meta charset=utf-8><style>td{mso-number-format:"\@"} td.n{mso-number-format:General} ' + (o.styles || '') + '</style></head><body><table border>'
+			let html = '<html><head><META HTTP-EQUIV="CONTENT-TYPE" CONTENT="text/html; charset=utf-8"><style>td{mso-number-format:"\@"} td.n{mso-number-format:General} ' + (o.styles || '') + '</style></head><body><table border>'
 
 			html += '<tr>'
 			for (let col of cols) html += '<th>' + col.name
