@@ -852,22 +852,32 @@
 				html += '<tr>'
 				
 				for (let cell = 0; cell < cols.length; cell ++) {
-				
+
+					if(this.parent && cell == 0){
+
+						html += `<td style="padding-left: ${24 * (this.level - 1)}px;">`
+
+					}else{
+
+						html += `<td>`
+
+					}
+
 					let columnDef = cols [cell]
 
 					html += '<td>'
 
 					let value = this [columnDef.field]
-					
+
 					let formatter = columnDef.formatter; if (formatter) {
-					
+
 						value = formatter (row, cell, value, columnDef, this)
 
 						if (value && typeof value === 'object' && 'text' in value) value = value.text
-						
+
 					}
 
-					if (value != null) html += value
+					if (value != null) html += value.replace(/^(&nbsp;)+/g, '')
 
 				}
 
