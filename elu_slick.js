@@ -855,7 +855,7 @@
 
 					if(this.parent && cell == 0){
 
-						html += `<td style="padding-left: ${24 * (this.level - 1)}px;">`
+						html += `<td style="padding-left: ${15 * (this.level - 1)}px;">`
 
 					}else{
 
@@ -864,8 +864,6 @@
 					}
 
 					let columnDef = cols [cell]
-
-					html += '<td>'
 
 					let value = this [columnDef.field]
 
@@ -877,7 +875,7 @@
 
 					}
 
-					if (value != null) html += value.replace(/^(&nbsp;)+/g, '')
+					if (value != null) html += value.replace(/^(<.*>)?(&nbsp;)+/g, '')
 
 				}
 
