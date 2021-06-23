@@ -838,6 +838,8 @@
         }
         
 		grid.saveAsXLS = async function (fn, cb, o = {}) {
+			
+			const parent_field = o.parent_field || 'parent'
 		
 			let cols = grid.getColumns ()
 
@@ -853,9 +855,11 @@
 				
 				for (let cell = 0; cell < cols.length; cell ++) {
 
-					if(this.parent && cell == 0){
+					if(this[parent_field] && cell == 0){
 
-						html += `<td style="padding-left: ${15 * (this.level - 1)}px;">`
+						let level = this.level ? this.level : 1
+
+						html += `<td style="padding-left: ${15 * level}px;">`
 
 					}else{
 
@@ -875,7 +879,7 @@
 
 					}
 
-					if (value != null) html += value.replace(/^(<.*>)?(&nbsp;)+/g, '')
+					if (value != null) html += value.replace(/^(<.*>)?(&nbsp;)+/g, '').replace(/width:16px/g, '')
 
 				}
 
