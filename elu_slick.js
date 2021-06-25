@@ -879,7 +879,17 @@
 
 					}
 
-					if (value != null) html += value.replace(/^(<.*>)?(&nbsp;)+/g, '').replace(/width:16px/g, '')
+					if (value != null) {
+
+						if(cell == 0 && typeof value === 'string'){
+
+							value = value.replace(/^(<.*>)?(&nbsp;)+/g, '').replace(/width:16px/g, '')
+
+						}
+
+						html += value
+
+					}
 
 				}
 
