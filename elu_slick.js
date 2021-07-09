@@ -676,6 +676,8 @@
                 let tag  = $input.get (0).tagName
                 let type = $input.attr ('filter-type') || $input.attr ('type')
 
+                if (tag == 'INPUT' && type == 'checkbox') return 'in'
+
                 if (tag == 'INPUT' && type != 'date') return 'contains'
 
                 return 'is'
@@ -689,6 +691,25 @@
 
                 if (type == 'date')
                     v = v.split(".").reverse().join("-")
+
+                if (type == 'checkbox') {
+                    const $cbxGroup = $input.closest('.cbx-group')
+                    if ($cbxGroup.length) {
+                        v = []
+                        const $cbxGroupItems = $cbxGroup.find('input[type="checkbox"]')
+                        const isTrigger = +$cbxGroup.attr('is_trigger')
+                        if (isTrigger) {
+                            $cbxGroupItems.not($input).prop('checked', false)
+                        }
+                        $cbxGroupItems.each((i, cbx) => {
+                            if ($(cbx).is(':checked')) {
+                                v = [...v, $(cbx).val()]
+                            }
+                        })
+                    } else {
+                        v = $input.is(":checked") ? [1] : null
+                    }
+                }
 
                 return v
             }
@@ -732,8 +753,10 @@
                     
                         $i.keyup ((e) => {if (e.which == 13) grid.setFieldFilter (grid.toSearch ($i))})
                         
-                        if ($i.attr ('type') == 'date')
-                            $i.change ((e) => {grid.setFieldFilter (grid.toSearch ($i))})
+                        if (['date', 'checkbox'].includes($i.attr ('type')))
+                            $i.change ((e) => {
+                                grid.setFieldFilter (grid.toSearch ($(e).length ? $(e.target) : $i))
+                            })
 
                         break
                         
