@@ -107,7 +107,8 @@
     }
 
     $.fn.draw_form = function (data, options = {}) {
-      const { is_confirm_unload = 0 } = options;
+    
+		const { is_confirm_unload = 0 } = options;
 
     	let _fields = data._fields; if (_fields) for (let _field of Object.values (_fields)) {
 
@@ -115,7 +116,7 @@
     		
     		if (v instanceof Date) v = v.toJSON ()
 
-    		if (v == null) v = ''; else v = '' + v
+    		if (v == null) v = ''; else if (!Array.isArray (v)) v = '' + v
     	
     		switch (_field.TYPE_NAME) {
     			case 'DATE':
