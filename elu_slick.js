@@ -454,11 +454,6 @@
 
 		for (let e of ['onColumnsResized', 'onColumnsReordered']) grid [e].subscribe (grid.notifyColumnsChanged)
 
-        if (o.max_height) {
-            $('.slick-viewport.slick-viewport-top.slick-viewport-left', $(this)).css ('max-height', o.max_height)
-            $('.slick-pane.slick-pane-top.slick-pane-left', $(this)).css ('max-height', o.max_height + 50)
-        }
-
         this.data ('grid', grid)
         
 		for (let plugin of plugins) grid.registerPlugin (plugin)
@@ -925,6 +920,20 @@
 
 			html.saveAs (fn)
 		
+		}
+
+		if (o.max_height) {
+			grid.onRendered.subscribe(function(e, args) {
+				const $gridCanvas = grid.getCanvasNode()
+				const $grid = $gridCanvas.closest('[class*=slickgrid_]')
+				const headerHeight = $('.slick-pane-header.slick-pane-left', $grid).outerHeight()
+				const headerRowHeight = $('.slick-pane-top.slick-pane-left .slick-headerrow', $grid).outerHeight()
+				const footerRowHeight = $('.slick-pane-top.slick-pane-left .slick-footerrow', $grid).outerHeight()
+				$('.slick-viewport.slick-viewport-top.slick-viewport-left', $grid)
+					.css ('max-height', o.max_height)
+				$('.slick-pane.slick-pane-top.slick-pane-left', $grid)
+					.css ('max-height', o.max_height + headerHeight + headerRowHeight + footerRowHeight)
+			})
 		}
                 
         $(window).on ('resize', function (e) {grid.resizeCanvas ()})
