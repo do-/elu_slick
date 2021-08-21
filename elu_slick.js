@@ -116,7 +116,7 @@
     		
     		if (v instanceof Date) v = v.toJSON ()
 
-    		if (v == null) v = ''; else if (!Array.isArray (v)) v = '' + v
+    		if (v == null) v = ''; else if (!Array.isArray (v) && v !== true && v !== false) v = '' + v
     	
     		switch (_field.TYPE_NAME) {
     			case 'DATE':
