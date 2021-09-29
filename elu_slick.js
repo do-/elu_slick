@@ -574,7 +574,7 @@
 
 			grid.each = async function (cb) {
 
-				let data = grid.data
+				let data = grid.getData()
 
 				for (let i = 0; i < data.length; i ++) cb.call (data [i], i)
 
