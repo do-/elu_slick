@@ -108,7 +108,7 @@
 
     $.fn.draw_form = function (data, options = {}) {
     
-		const { is_confirm_unload = 0 } = options;
+		const { is_confirm_unload = 0, is_ro = 0 } = options;
 
     	let _fields = data._fields; if (_fields) for (let _field of Object.values (_fields)) {
 
@@ -227,7 +227,7 @@
 
         }
 
-        if ($('button[name=edit]', $view).length * $('button[name=cancel]', $view).length > 0) read_only.on ()
+        if (is_ro || $('button[name=edit]', $view).length * $('button[name=cancel]', $view).length > 0) read_only.on ()
 
         return $view
         
