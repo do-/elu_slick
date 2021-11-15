@@ -189,7 +189,7 @@
                     if (is_visible (this.name, 0)) $(this).show (); else $(this).hide ()
                 })
                 
-                $(':input', $view).not ('button').each (function () {
+                $(':input', $view).not ('button').not('[readonly]').each (function () {
                     $(this).prop ({disabled: 0})
                 })
 
