@@ -46,7 +46,9 @@
 	    return values (this).actual ().validated ()
     }
     
-    $.fn.draw_popup = function (o = {}) {
+    $.fn.draw_popup = function (opt = {}) {
+
+        let o = clone (opt)
 
     	if (this.is ('[noresize]')) o.resizable = false
 
